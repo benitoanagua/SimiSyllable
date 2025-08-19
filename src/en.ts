@@ -4,10 +4,9 @@ import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// Cargar diccionario CMU procesado - rutas corregidas
+// Cargar diccionario CMU procesado
 let cmuDict: Record<string, number> = {};
 try {
-  // Intentar cargar desde dist/data/ (para producción)
   const cmuData = readFileSync(
     join(__dirname, "..", "data", "cmudict-processed.json"),
     "utf-8"
@@ -16,7 +15,6 @@ try {
   console.log("CMU dictionary loaded successfully from dist/data/");
 } catch (error) {
   try {
-    // Intentar cargar desde data/ (para desarrollo)
     const cmuData = readFileSync(
       join(__dirname, "..", "..", "data", "cmudict-processed.json"),
       "utf-8"
@@ -24,53 +22,27 @@ try {
     cmuDict = JSON.parse(cmuData);
     console.log("CMU dictionary loaded successfully from data/");
   } catch (error) {
-    console.warn("CMU dictionary not found, using fallback algorithm");
+    console.warn("CMU dictionary not found, using improved algorithm");
   }
 }
-
-// Diccionario personalizado de respaldo - valores corregidos
-const customEnDict: Record<string, number> = {
-  beautiful: 3,
-  certain: 2,
-  king: 1,
-  garden: 2,
-  spring: 1,
-  melody: 3,
-  rivulets: 3,
-  sun: 1,
-  rhythm: 2, // Corregido: "rhythm" no "rhythm"
-  eye: 1,
-  the: 1,
-  hello: 2,
-  world: 1,
-  syllable: 3,
-  water: 2,
-  computer: 3,
-};
-
-const VOWELS = /[aeiouy]/gi;
 
 export function countEn(word: string): number {
   const w = word.toLowerCase().replace(/[^a-z]/g, "");
   if (!w) return 0;
 
-  // 1. Verificar diccionario personalizado
-  if (customEnDict[w]) {
-    return customEnDict[w];
-  }
-
-  // 2. Verificar diccionario CMU
-  if (cmuDict[w]) {
+  // Usar CMU si existe
+  if (Object.keys(cmuDict).length > 0 && cmuDict[w]) {
     return cmuDict[w];
   }
 
-  // 3. Algoritmo simplificado pero más preciso
   let count = 0;
+  const vowels = "aeiouy";
   let prevIsVowel = false;
 
+  // Contar sílabas basado en transiciones vocal-consonante
   for (let i = 0; i < w.length; i++) {
     const char = w[i];
-    const isVowel = /[aeiouy]/.test(char);
+    const isVowel = vowels.includes(char);
 
     if (isVowel && !prevIsVowel) {
       count++;
@@ -78,13 +50,41 @@ export function countEn(word: string): number {
     prevIsVowel = isVowel;
   }
 
-  // Ajustes especiales
-  if (w.endsWith("e") && count > 1) {
-    count--;
+  // 🔹 Reglas especiales para inglés
+  // E muda final (excepto después de consonante + le)
+  if (w.endsWith("e") && !w.endsWith("le") && count > 1) {
+    count--; // e muda
   }
 
-  if (w.endsWith("le") && !/[aeiouy]/.test(w[w.length - 3])) {
-    count++;
+  // le después de consonante agrega sílaba
+  if (w.endsWith("le") && w.length > 2 && !vowels.includes(w[w.length - 3])) {
+    count++; // table, little
+  }
+
+  // Hiatos comunes que deben contar como sílabas separadas
+  if (/ia|io|eo/.test(w)) {
+    count++; // media, lion, video
+  }
+
+  // ism agrega sílaba
+  if (w.endsWith("ism")) {
+    count++; // realism, organism
+  }
+
+  // ed muda (no se pronuncia como sílaba extra)
+  if (w.endsWith("ed") && !/[td]ed$/.test(w)) {
+    count--; // walked, baked
+  }
+
+  // es plural agrega sílaba en algunos casos
+  if (w.endsWith("es") && count === 1) {
+    count++; // wishes, roses
+  }
+
+  // qu no cuenta como dos vocales
+  if (w.includes("qu")) {
+    const quCount = (w.match(/qu/g) || []).length;
+    count -= quCount;
   }
 
   return Math.max(1, count);
