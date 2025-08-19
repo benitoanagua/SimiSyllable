@@ -12,12 +12,16 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "data"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "npm run download-dicts && tsc && npm run copy-json",
+    "download-dicts": "node scripts/download-dicts.js",
+    "copy-json": "node scripts/copy-json.js",
     "test": "vitest",
-    "prepublishOnly": "npm run build && npm test"
+    "prepublishOnly": "npm run build && npm test",
+    "postinstall": "npm run download-dicts"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
@@ -29,7 +33,8 @@
     "counter",
     "english",
     "spanish",
-    "linguistics"
+    "linguistics",
+    "cmudict"
   ],
   "author": "Tu nombre",
   "license": "MIT"

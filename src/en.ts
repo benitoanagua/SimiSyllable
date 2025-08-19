@@ -1,3 +1,21 @@
+import { readFileSync } from "fs";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+// Cargar diccionario CMU procesado
+let cmuDict: Record<string, number> = {};
+try {
+  const cmuData = readFileSync(
+    join(__dirname, "..", "data", "cmudict-processed.json"),
+    "utf-8"
+  );
+  cmuDict = JSON.parse(cmuData);
+} catch (error) {
+  console.warn("CMU dictionary not found, using fallback algorithm");
+}
+
 // Diccionario personalizado de respaldo
 const customEnDict: Record<string, number> = {
   beautiful: 3,
@@ -24,8 +42,7 @@ const TRIPHTHONGS = /iai|ieu|iei|uai|uei|uau|iai|uay|uey/gi;
 const SILENT_E = /[^aeiouy][aeiouy][^aeiouy]e$/i;
 const LE_ENDING = /[^aeiouy]le$/i;
 
-export function countEn(word: string): number {
-  // Cambiado de countEs a countEn
+export default function countEn(word: string): number {
   const w = word.toLowerCase().replace(/[^a-z]/g, "");
   if (!w) return 0;
 
@@ -34,34 +51,38 @@ export function countEn(word: string): number {
     return customEnDict[w];
   }
 
-  // 2. Algoritmo mejorado para palabras no encontradas
+  // 2. Verificar diccionario CMU
+  if (cmuDict[w]) {
+    return cmuDict[w];
+  }
+
+  // 3. Algoritmo mejorado para palabras no encontradas
   let count = 0;
 
   // Contar vocales
   const vowels = w.match(VOWELS);
-  if (!vowels) return 1; // Al menos una sílaba
+  if (!vowels) return 1;
 
   count = vowels.length;
 
-  // Restar diptongos (se cuentan como una sílaba)
+  // Restar diptongos y triptongos
   const diphthongs = w.match(DIPHTHONGS);
   if (diphthongs) count -= diphthongs.length;
 
-  // Restar triptongos (se cuentan como una sílaba)
   const triphthongs = w.match(TRIPHTHONGS);
   if (triphthongs) count -= triphthongs.length;
 
-  // Ajustar sílabas silenciosas (final 'e' mudo)
+  // Ajustar sílabas silenciosas
   if (SILENT_E.test(w) && count > 1) {
     count--;
   }
 
-  // Ajustar para palabras que terminan en "le" precedida por consonante
+  // Ajustar para palabras que terminan en "le"
   if (LE_ENDING.test(w) && count > 1) {
     count++;
   }
 
-  // Palabras que terminan en "sm" tienen al menos 2 sílabas
+  // Palabras que terminan en "sm"
   if (w.endsWith("sm") && count === 1) {
     count = 2;
   }

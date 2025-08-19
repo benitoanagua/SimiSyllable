@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { countEn } from "../src/en";
+import { countEn } from "../src/index.js";
 
 test("basic english", () => {
   expect(countEn("spring")).toBe(1);

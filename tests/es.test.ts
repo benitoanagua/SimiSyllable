@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { countEs } from "../src/es";
+import { countEs } from "../src/index.js";
 
 test("basic spanish", () => {
   expect(countEs("sol")).toBe(1);
