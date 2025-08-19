@@ -2,7 +2,7 @@
   "name": "simi-syllable",
   "version": "1.0.0",
   "type": "module",
-  "description": "Accurate syllable counter for English and Spanish.",
+  "description": "Advanced syllable counter for English and Spanish using linguistic databases",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -20,15 +20,16 @@
     "prepublishOnly": "npm run build && npm test"
   },
   "devDependencies": {
+    "@types/node": "^22.10.2",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"
   },
   "keywords": [
     "syllable",
+    "counter",
     "english",
     "spanish",
-    "counter",
-    "es"
+    "linguistics"
   ],
   "author": "Tu nombre",
   "license": "MIT"

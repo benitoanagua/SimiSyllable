@@ -6,7 +6,11 @@
     "declaration": true,
     "outDir": "dist",
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "moduleDetection": "force",
+    "allowSyntheticDefaultImports": true
   },
-  "include": ["src"]
+  "include": ["src", "src/**/*.json"]
 }
