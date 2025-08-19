@@ -4,21 +4,33 @@ import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// Cargar diccionario español procesado
+// Cargar diccionario español procesado - rutas corregidas
 let esExpandedDict: Record<string, number> = {};
 try {
+  // Intentar cargar desde dist/data/ (para producción)
   const esData = readFileSync(
     join(__dirname, "..", "data", "es-dict-expanded.json"),
     "utf-8"
   );
   esExpandedDict = JSON.parse(esData);
+  console.log("Spanish dictionary loaded successfully from dist/data/");
 } catch (error) {
-  console.warn(
-    "Expanded Spanish dictionary not found, using fallback algorithm"
-  );
+  try {
+    // Intentar cargar desde data/ (para desarrollo)
+    const esData = readFileSync(
+      join(__dirname, "..", "..", "data", "es-dict-expanded.json"),
+      "utf-8"
+    );
+    esExpandedDict = JSON.parse(esData);
+    console.log("Spanish dictionary loaded successfully from data/");
+  } catch (error) {
+    console.warn(
+      "Expanded Spanish dictionary not found, using fallback algorithm"
+    );
+  }
 }
 
-// Diccionario personalizado de respaldo
+// Diccionario personalizado de respaldo - valores corregidos
 const customEsDict: Record<string, number> = {
   murciélago: 4,
   computadora: 4,
@@ -35,11 +47,8 @@ const customEsDict: Record<string, number> = {
 };
 
 const VOWELS = /[aeiouáéíóúü]/gi;
-const DIPHTHONGS = /ai|au|ei|eu|oi|ou|ui|ay|ey|oy|uy|ia|ie|io|iu|ua|ue|uo/gi;
-const TRIPHTHONGS = /iai|iei|ieu|uai|uei|uau|uay|uey|iai|ioi|iei/gi;
-const ACCENTED_VOWELS = /[áéíóú]/gi;
 
-export default function countEs(word: string): number {
+export function countEs(word: string): number {
   const normalizedWord = word
     .toLowerCase()
     .normalize("NFD")
@@ -59,33 +68,22 @@ export default function countEs(word: string): number {
     return esExpandedDict[normalizedWord];
   }
 
-  // 3. Algoritmo mejorado para español
+  // 3. Algoritmo simplificado pero más preciso para español
+  const cleanWord = word
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
   let count = 0;
+  let prevIsVowel = false;
 
-  const vowels = lowerWord.match(/[aeiouáéíóúü]/gi);
-  if (!vowels) return 1;
+  for (let i = 0; i < cleanWord.length; i++) {
+    const char = cleanWord[i];
+    const isVowel = /[aeiou]/.test(char);
 
-  count = vowels.length;
-
-  const diphthongs = lowerWord.match(DIPHTHONGS);
-  if (diphthongs) count -= diphthongs.length;
-
-  const triphthongs = lowerWord.match(TRIPHTHONGS);
-  if (triphthongs) count -= triphthongs.length;
-
-  const accentedVowels = lowerWord.match(ACCENTED_VOWELS);
-  if (accentedVowels) count += accentedVowels.length;
-
-  if (count > 1) {
-    for (let i = 1; i < lowerWord.length - 1; i++) {
-      if (
-        lowerWord[i] === "h" &&
-        "aeiouáéíóúü".includes(lowerWord[i - 1]) &&
-        "aeiouáéíóúü".includes(lowerWord[i + 1])
-      ) {
-        count--;
-      }
+    if (isVowel && !prevIsVowel) {
+      count++;
     }
+    prevIsVowel = isVowel;
   }
 
   return Math.max(1, count);

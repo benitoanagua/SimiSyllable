@@ -1,3 +1,4 @@
+// Archivo: ./scripts/copy-json.js
 import { copyFileSync, mkdirSync, existsSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
@@ -10,17 +11,17 @@ if (!existsSync(distDataDir)) {
   mkdirSync(distDataDir, { recursive: true });
 }
 
-// Copiar archivos JSON de src/data a dist/data
-const filesToCopy = ["en-dict.json", "es-dict.json"];
+// Copiar archivos JSON de data/ a dist/data/
+const filesToCopy = ["cmudict-processed.json", "es-dict-expanded.json"];
 
 for (const file of filesToCopy) {
-  const source = join(__dirname, "..", "src", "data", file);
+  const source = join(__dirname, "..", "data", file);
   const destination = join(distDataDir, file);
 
   if (existsSync(source)) {
     copyFileSync(source, destination);
     console.log(`Copied ${file} to dist/data/`);
   } else {
-    console.warn(`File ${file} not found in src/data/`);
+    console.warn(`File ${file} not found in data/`);
   }
 }

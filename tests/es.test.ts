@@ -21,3 +21,10 @@ test("edge cases", () => {
   expect(countEs("ciudad")).toBe(2);
   expect(countEs("aire")).toBe(2);
 });
+
+test("Spanish dictionary words", () => {
+  // Probar algunas palabras que deberían estar en el diccionario español
+  expect(countEs("computadora")).toBe(4);
+  expect(countEs("murciélago")).toBe(4);
+  expect(countEs("mañana")).toBe(3);
+});

@@ -21,3 +21,10 @@ test("edge cases", () => {
   expect(countEn("eye")).toBe(1);
   expect(countEn("the")).toBe(1);
 });
+
+test("CMU dictionary words", () => {
+  // Probar algunas palabras que deberían estar en el diccionario CMU
+  expect(countEn("computer")).toBe(3);
+  expect(countEn("beautiful")).toBe(3);
+  expect(countEn("water")).toBe(2);
+});

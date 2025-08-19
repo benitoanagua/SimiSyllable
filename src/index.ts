@@ -1,5 +1,5 @@
-import countEn from "./en.js";
-import countEs from "./es.js";
+import { countEn } from "./en.js";
+import { countEs } from "./es.js";
 
 export { countEn, countEs };
 

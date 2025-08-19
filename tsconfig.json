@@ -10,7 +10,8 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "moduleDetection": "force",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "allowImportingTsExtensions": false
   },
-  "include": ["src", "src/**/*.json"]
+  "include": ["src"]
 }
