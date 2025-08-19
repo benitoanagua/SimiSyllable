@@ -1,0 +1,35 @@
+{
+  "name": "simi-syllable",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Accurate syllable counter for English and Spanish.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  },
+  "keywords": [
+    "syllable",
+    "english",
+    "spanish",
+    "counter",
+    "es"
+  ],
+  "author": "Tu nombre",
+  "license": "MIT"
+}
