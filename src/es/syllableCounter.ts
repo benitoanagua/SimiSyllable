@@ -6,9 +6,23 @@ import {
 } from "./patterns.js";
 
 export function countSyllablesInWord(word: string): number {
-  const processedWord = applySpanishExceptions(word.toLowerCase());
-  const syllables = splitIntoSyllables(processedWord);
-  return syllables.length;
+  let processedWord = word.toLowerCase();
+
+  // Verificar palabras problemáticas primero
+  const normalizedForProblematic = processedWord
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z]/g, "");
+
+  if (problematic[normalizedForProblematic]) {
+    return problematic[normalizedForProblematic];
+  }
+
+  // Aplicar excepciones del español
+  processedWord = applySpanishExceptions(processedWord);
+
+  // Contar núcleos vocálicos (aproximación mejorada)
+  return countVocalicNuclei(processedWord);
 }
 
 function applySpanishExceptions(word: string): string {
@@ -19,83 +33,59 @@ function applySpanishExceptions(word: string): string {
   return result;
 }
 
-function splitIntoSyllables(word: string): string[] {
-  const vowels = "aeiouáéíóú";
-  const syllables: string[] = [];
-  let currentSyllable = "";
+function countVocalicNuclei(word: string): number {
+  const vowels = /[aeiouáéíóúü]/gi;
+  const strongVowels = /[aeoáéó]/gi;
+  const weakVowels = /[iuíúü]/gi;
+
+  let syllableCount = 0;
   let i = 0;
 
   while (i < word.length) {
-    const char = word[i];
-    const isVowel = vowels.includes(char);
-
-    if (isVowel) {
-      if (currentSyllable) {
-        syllables.push(currentSyllable);
-        currentSyllable = "";
-      }
-
-      currentSyllable += char;
+    if (vowels.test(word[i])) {
+      syllableCount++;
+      let vocalGroup = word[i];
       i++;
 
-      // Agregar vocales consecutivas (diptongos/triptongos)
-      while (i < word.length && vowels.includes(word[i])) {
-        currentSyllable += word[i];
+      // Recoger grupo vocálico completo
+      while (i < word.length && vowels.test(word[i])) {
+        vocalGroup += word[i];
         i++;
       }
 
-      syllables.push(currentSyllable);
-      currentSyllable = "";
+      // Ajustar para diptongos y triptongos
+      syllableCount += countAdditionalSyllablesInGroup(vocalGroup) - 1;
     } else {
-      currentSyllable += char;
       i++;
     }
   }
 
-  if (currentSyllable) {
-    syllables.push(currentSyllable);
-  }
-
-  return joinSyllables(syllables);
+  return Math.max(1, syllableCount);
 }
 
-function joinSyllables(syllables: string[]): string[] {
-  const result: string[] = [];
-  let currentOnset = "";
+function countAdditionalSyllablesInGroup(group: string): number {
+  if (group.length <= 1) return 1;
 
-  for (const syllable of syllables) {
-    const hasVowel = syllable
-      .split("")
-      .some((char) => "aeiouáéíóú".includes(char));
+  const strongVowels = /[aeoáéó]/gi;
+  const weakVowels = /[iuíúü]/gi;
 
-    if (hasVowel) {
-      if (currentOnset) {
-        let onsetToAdd = currentOnset;
+  let strongCount = (group.match(strongVowels) || []).length;
+  let weakCount = (group.match(weakVowels) || []).length;
 
-        for (const onset of INDIVISIBLE_ONSETS) {
-          if (currentOnset.endsWith(onset)) {
-            const remaining = currentOnset.slice(0, -onset.length);
-            if (remaining && result.length > 0) {
-              result[result.length - 1] += remaining;
-            }
-            onsetToAdd = onset;
-            break;
-          }
-        }
+  // Reglas simplificadas:
+  // - Una vocal fuerte = 1 sílaba
+  // - Dos vocales fuertes = 2 sílabas (hiato)
+  // - Vocal fuerte + débil = 1 sílaba (diptongo)
+  // - Dos débiles = 1 sílaba (diptongo)
+  // - Tres vocales con una fuerte en medio = 1 sílaba (triptongo)
 
-        result.push(onsetToAdd + syllable);
-        currentOnset = "";
-      } else {
-        result.push(syllable);
-      }
-    } else {
-      currentOnset += syllable;
-    }
+  if (strongCount >= 2) {
+    return strongCount; // Hiatos múltiples
+  } else if (strongCount === 1) {
+    return 1; // Diptongo o triptongo
+  } else if (weakCount >= 2) {
+    return 1; // Diptongo de débiles
   }
 
-  if (currentOnset && result.length > 0) {
-    result[result.length - 1] += currentOnset;
-  }
-
-  return result.filter((syl) => syl.length > 0);
+  return 1;
 }

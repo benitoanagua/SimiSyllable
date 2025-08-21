@@ -12,7 +12,6 @@ import {
 } from "./patterns.js";
 
 export function countSyllablesInWord(word: string): number {
-  let count = 0;
   const value = word.toLowerCase().replace(/['']/g, "");
 
   if (value.length === 0) return 0;
@@ -22,6 +21,8 @@ export function countSyllablesInWord(word: string): number {
   if (problematic[value]) {
     return problematic[value];
   }
+
+  let count = 0;
 
   const addOne = () => {
     count++;
@@ -47,20 +48,34 @@ export function countSyllablesInWord(word: string): number {
       return "";
     });
 
-  // Contar grupos de vocales
-  const parts = processed.split(/[^aeiouy]+/);
-  for (const part of parts) {
-    if (part !== "") count++;
+  // Contar grupos de vocales en lo que queda
+  const remainingVowelGroups = processed.match(/[aeiouy]+/g) || [];
+  count += remainingVowelGroups.length;
+
+  // Ajustes basados en reglas fonológicas
+  let tempWord = value;
+
+  // Aplicar reglas de reducción (monosílabas)
+  if (EXPRESSION_MONOSYLLABIC_ONE.test(tempWord)) {
+    count = Math.max(1, count - 1);
+  }
+  if (EXPRESSION_MONOSYLLABIC_TWO.test(tempWord)) {
+    count = Math.max(1, count - 1);
   }
 
-  // Ajustes basados en reglas
-  processed
-    .replace(EXPRESSION_MONOSYLLABIC_ONE, subtractOne)
-    .replace(EXPRESSION_MONOSYLLABIC_TWO, subtractOne)
-    .replace(EXPRESSION_DOUBLE_SYLLABIC_ONE, addOne)
-    .replace(EXPRESSION_DOUBLE_SYLLABIC_TWO, addOne)
-    .replace(EXPRESSION_DOUBLE_SYLLABIC_THREE, addOne)
-    .replace(EXPRESSION_DOUBLE_SYLLABIC_FOUR, addOne);
+  // Aplicar reglas de aumento (bisílabas)
+  if (EXPRESSION_DOUBLE_SYLLABIC_ONE.test(tempWord)) {
+    count++;
+  }
+  if (EXPRESSION_DOUBLE_SYLLABIC_TWO.test(tempWord)) {
+    count++;
+  }
+  if (EXPRESSION_DOUBLE_SYLLABIC_THREE.test(tempWord)) {
+    count++;
+  }
+  if (EXPRESSION_DOUBLE_SYLLABIC_FOUR.test(tempWord)) {
+    count++;
+  }
 
   return Math.max(1, count);
 }

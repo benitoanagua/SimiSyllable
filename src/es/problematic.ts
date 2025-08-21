@@ -15,7 +15,7 @@ export const problematic: Record<string, number> = {
   rio: 2,
   ciudad: 2,
   aire: 2,
-  mañana: 3,
+  mañana: 3, // ma-ña-na = 3 sílabas
   hielo: 2,
   país: 2,
   árbol: 2,
@@ -24,5 +24,7 @@ export const problematic: Record<string, number> = {
   viuda: 2,
   causa: 2,
   sol: 1,
-  murciélago: 4,
+  murciélago: 4, // mur-cié-la-go = 4 sílabas
+  // Agregadas para corregir problemas del diccionario
+  manana: 3, // versión sin tilde también
 };

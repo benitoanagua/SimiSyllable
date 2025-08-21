@@ -1,5 +1,6 @@
 import { esDict } from "./dict.js";
 import { countSyllablesInWord } from "./syllableCounter.js";
+import { problematic } from "./problematic.js";
 
 export function countEs(word: string, useDict: boolean = true): number {
   const normalizedWord = word
@@ -10,10 +11,16 @@ export function countEs(word: string, useDict: boolean = true): number {
 
   if (!normalizedWord) return 0;
 
-  // Usar diccionario español si está disponible
+  // 1. Primero verificar palabras problemáticas (mayor prioridad)
+  if (problematic[normalizedWord]) {
+    return problematic[normalizedWord];
+  }
+
+  // 2. Luego usar diccionario español si está disponible y habilitado
   if (useDict && esDict[normalizedWord]) {
     return esDict[normalizedWord];
   }
 
+  // 3. Finalmente usar algoritmo de respaldo
   return countSyllablesInWord(word);
 }
