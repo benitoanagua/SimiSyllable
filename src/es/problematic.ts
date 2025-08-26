@@ -1,1 +1,3 @@
-export const problematic: Record<string, number> = {};
+export const problematic: Record<string, number> = {
+  país: 2,
+};

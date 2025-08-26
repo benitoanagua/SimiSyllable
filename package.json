@@ -16,7 +16,8 @@
     "data"
   ],
   "scripts": {
-    "build": "npm run download-dicts && tsc && npm run copy-json",
+    "build": "tsc",
+    "build-dicts": "npm run download-dicts && tsc && npm run copy-json",
     "download-dicts": "node scripts/download-dicts.js",
     "copy-json": "node scripts/copy-json.js",
     "test": "vitest",

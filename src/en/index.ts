@@ -2,7 +2,7 @@ import { cmuDict } from "./dict.js";
 import { countSyllablesInWord } from "./syllableCounter.js";
 import { problematic } from "./problematic.js";
 
-export function countEn(word: string, useDict: boolean = true): number {
+export function countEn(word: string): number {
   const w = word.toLowerCase().replace(/[^a-z]/g, "");
   if (!w) return 0;
 
@@ -12,7 +12,7 @@ export function countEn(word: string, useDict: boolean = true): number {
   }
 
   // 2. Luego usar diccionario CMU si está disponible y habilitado
-  if (useDict && cmuDict[w]) {
+  if (cmuDict[w]) {
     return cmuDict[w];
   }
 

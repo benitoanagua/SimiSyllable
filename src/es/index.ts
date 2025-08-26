@@ -1,30 +1,21 @@
+// import { esDict } from "./dict.js";
 import { countSyllablesInWord } from "./syllableCounter.js";
-import { esDict } from "./dict.js";
 import { problematic } from "./problematic.js";
 
-export function countEs(
-  word: string,
-  useDict: boolean = false, // << false por defecto
-  useProblematic: boolean = false // << false por defecto
-): number {
-  const normalized = word
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z]/g, "");
+export function countEs(word: string): number {
+  const w = word.toLowerCase().replace(/[^a-záéíóúüñ]/g, "");
+  if (!w) return 0;
 
-  if (!normalized) return 0;
-
-  // 1. Lista problemática (solo si se pide)
-  if (useProblematic && problematic[normalized] !== undefined) {
-    return problematic[normalized];
+  // 1. Primero verificar palabras problemáticas (mayor prioridad)
+  if (problematic[w]) {
+    return problematic[w];
   }
 
-  // 2. Diccionario (solo si se pide)
-  if (useDict && esDict[normalized] !== undefined) {
-    return esDict[normalized];
-  }
+  // 2. Luego usar diccionario CMU si está disponible y habilitado
+  // if (esDict[w]) {
+  //   return esDict[w];
+  // }
 
-  // 3. Algoritmo jsESsyllable (siempre disponible)
-  return countSyllablesInWord(word);
+  // 3. Finalmente usar algoritmo de respaldo
+  return countSyllablesInWord(w);
 }
