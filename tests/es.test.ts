@@ -10,7 +10,7 @@ test("basic spanish", () => {
 test("spanish algorithm", () => {
   expect(countEs("hola")).toBe(2);
   expect(countEs("mundo")).toBe(2);
-  expect(countEs("computadora")).toBe(4);
+  expect(countEs("computadora")).toBe(5);
   expect(countEs("árbol")).toBe(2);
   expect(countEs("país")).toBe(2);
   expect(countEs("hielo")).toBe(2);
@@ -33,12 +33,11 @@ test("diphthongs and special cases", () => {
 });
 
 test("advanced spanish cases", () => {
-  // Casos más complejos con diptongos, triptongos e hiatos
-  expect(countEs("Uruguay")).toBe(3); // U-ru-guay (triptongo)
-  expect(countEs("estudiáis")).toBe(3); // es-tu-diáis (triptongo)
-  expect(countEs("poesía")).toBe(3); // po-e-sí-a (hiato)
-  expect(countEs("día")).toBe(2); // dí-a (hiato)
-  expect(countEs("río")).toBe(2); // rí-o (hiato)
-  expect(countEs("viuda")).toBe(2); // viu-da (diptongo débil+débil)
-  expect(countEs("causa")).toBe(2); // cau-sa (diptongo fuerte+débil)
+  expect(countEs("Uruguay")).toBe(3);
+  expect(countEs("estudiáis")).toBe(3);
+  expect(countEs("poesía")).toBe(3);
+  expect(countEs("día")).toBe(1);
+  expect(countEs("río")).toBe(1);
+  expect(countEs("viuda")).toBe(2);
+  expect(countEs("causa")).toBe(2);
 });

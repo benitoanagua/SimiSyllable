@@ -3,7 +3,13 @@ import { countEs } from "./es/index.js";
 
 export { countEn, countEs };
 
-export function count(word: string, lang: "en" | "es" = "en"): number {
-  const useDict = process.env.USE_DICT !== "false";
-  return lang === "es" ? countEs(word, useDict) : countEn(word, useDict);
+export function count(
+  word: string,
+  lang: "en" | "es" = "en",
+  useDict: boolean = false, // nuevo
+  useProblematic: boolean = false // nuevo
+): number {
+  return lang === "es"
+    ? countEs(word, useDict, useProblematic)
+    : countEn(word, useDict); // inglés no usa problematic
 }
