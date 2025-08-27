@@ -1,44 +1,59 @@
-import { expect, test } from "vitest";
-import { countEn } from "../src/index.js";
+import { expect, test, describe } from "vitest";
+import { countEn, syllabifyEn } from "../src/en/index.js";
 
-test("basic english", () => {
-  expect(countEn("spring")).toBe(1);
-  expect(countEn("beautiful")).toBe(3);
-  expect(countEn("king")).toBe(1);
-});
+describe("Silabeador inglés - aproximación fonética", () => {
+  test("Monosílabos comunes", () => {
+    expect(countEn("the")).toBe(1);
+    expect(countEn("a")).toBe(1);
+    expect(countEn("eye")).toBe(1);
+    expect(countEn("you")).toBe(1);
+    expect(countEn("sky")).toBe(1);
+  });
 
-test("english algorithm", () => {
-  expect(countEn("hello")).toBe(2);
-  expect(countEn("world")).toBe(1);
-  expect(countEn("syllable")).toBe(3);
-  expect(countEn("water")).toBe(2);
-  expect(countEn("computer")).toBe(3);
-  expect(countEn("rhythm")).toBe(2);
-  expect(countEn("eye")).toBe(1);
-  expect(countEn("the")).toBe(1);
-});
+  test("Palabras con terminaciones especiales", () => {
+    expect(countEn("action")).toBe(2);
+    expect(countEn("nature")).toBe(2);
+    expect(countEn("table")).toBe(2);
+    expect(countEn("possible")).toBe(3);
+  });
 
-test("edge cases", () => {
-  expect(countEn("")).toBe(0);
-  expect(countEn("a")).toBe(1);
-  expect(countEn("I")).toBe(1);
-});
+  test("Palabras compuestas", () => {
+    expect(countEn("baseball")).toBe(2);
+    expect(countEn("sunset")).toBe(2);
+    expect(countEn("notebook")).toBe(2);
+  });
 
-test("diphthongs and special cases", () => {
-  expect(countEn("audio")).toBe(3);
-  expect(countEn("poem")).toBe(2);
-  expect(countEn("fire")).toBe(2);
-  expect(countEn("hour")).toBe(2);
-  expect(countEn("people")).toBe(2);
-});
+  test("Palabras con letras silenciosas", () => {
+    expect(countEn("knight")).toBe(1);
+    expect(countEn("psychology")).toBe(4);
+    expect(countEn("write")).toBe(1);
+    expect(countEn("lamb")).toBe(1);
+  });
 
-test("advanced english cases", () => {
-  // Casos más complejos
-  expect(countEn("queue")).toBe(1); // queue = 1 sílaba
-  expect(countEn("science")).toBe(2); // sci-ence = 2 sílabas
-  expect(countEn("realism")).toBe(3); // re-al-ism = 3 sílabas
-  expect(countEn("walked")).toBe(1); // walk-ed (ed mudo) = 1 sílaba
-  expect(countEn("wished")).toBe(2); // wish-ed = 2 sílabas
-  expect(countEn("media")).toBe(3); // me-di-a = 3 sílabas (hiato)
-  expect(countEn("video")).toBe(3); // vi-de-o = 3 sílabas (hiato)
+  test("Palabras con diptongos", () => {
+    expect(countEn("boat")).toBe(1);
+    expect(countEn("cloud")).toBe(1);
+    expect(countEn("coin")).toBe(1);
+    expect(countEn("house")).toBe(1);
+  });
+
+  test("Palabras con múltiples sílabas", () => {
+    expect(countEn("beautiful")).toBe(3);
+    expect(countEn("university")).toBe(5);
+    expect(countEn("opportunity")).toBe(5);
+    expect(countEn("character")).toBe(3);
+  });
+
+  test("División silábica", () => {
+    expect(syllabifyEn("hello")).toEqual(["hel", "lo"]);
+    expect(syllabifyEn("water")).toEqual(["wa", "ter"]);
+    expect(syllabifyEn("family")).toEqual(["fa", "mi", "ly"]);
+  });
+
+  test("Casos edge", () => {
+    expect(countEn("")).toBe(0);
+    expect(countEn("   ")).toBe(0);
+    expect(countEn("123")).toBe(0);
+    expect(syllabifyEn("")).toEqual([]);
+  });
 });

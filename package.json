@@ -17,9 +17,6 @@
   ],
   "scripts": {
     "build": "tsc",
-    "build-dicts": "npm run download-dicts && tsc && npm run copy-json",
-    "download-dicts": "node scripts/download-dicts.js",
-    "copy-json": "node scripts/copy-json.js",
     "test": "vitest",
     "prepublishOnly": "npm run build && npm test",
     "postinstall": "npm run download-dicts"
