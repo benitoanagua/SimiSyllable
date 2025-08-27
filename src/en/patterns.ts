@@ -50,12 +50,12 @@ export const SYLLABLE_EXCEPTIONS = new Map([
 
 // Patrones de sufijos que afectan el conteo silábico
 export const SUFFIX_PATTERNS = [
-  { pattern: /(tion|sion|cian)$/, adjustment: -1 }, // -1 sílaba
-  { pattern: /(ture|sure)$/, adjustment: -1 }, // -1 sílaba
-  { pattern: /(able|ible|ance|ence|ancy|ency)$/, adjustment: 1 }, // +1 sílaba
-  { pattern: /(ism|ship|hood|ment|ness|less)$/, adjustment: 1 }, // +1 sílaba
-  { pattern: /(ing|est|ful|ive|ous|ial|ian|ity|ety)$/, adjustment: 0 }, // neutral
-  { pattern: /(ed|es|er|ly)$/, adjustment: 0 }, // neutral
+  { pattern: /(tion|sion|cian)$/, adjustment: -1 },
+  { pattern: /(ture|sure)$/, adjustment: -1 },
+  { pattern: /(able|ible|ance|ence|ancy|ency)$/, adjustment: 1 },
+  { pattern: /(ism|ship|hood|ment|ness|less)$/, adjustment: 1 },
+  { pattern: /(ing|est|ful|ive|ous|ial|ian|ity|ety)$/, adjustment: 0 },
+  { pattern: /(ed|es|er|ly)$/, adjustment: 0 },
 ];
 
 // Diptongos comunes (cuentan como 1 sílaba)
@@ -80,12 +80,23 @@ export const DIPHTHONGS = [
   "ui",
 ];
 
-// Patrones de división silábica
-export const DIVISION_PATTERNS = [
-  // Dividir después de vocal antes de consonante+vocal (VC-V)
-  /([aeiouy])([bcdfghjklmnpqrstvwxyz][aeiouy])/,
-  // Dividir entre consonantes dobles
-  /([bcdfghjklmnpqrstvwxyz])([bcdfghjklmnpqrstvwxyz])/,
-  // Dividir antes de sufijos comunes
-  /(.*)(tion|sion|cian|ture|sure|able|ible|ance|ence|ment|ness|ing|est)$/,
+// Patrones de división silábica mejorados
+export const DIVISION_RULES = [
+  // Regla 1: Dividir después de vocal antes de consonante (VC-CV)
+  { pattern: /([aeiouy])([^aeiouy][aeiouy])/, position: 1 },
+
+  // Regla 2: Dividir entre consonantes dobles
+  { pattern: /([^aeiouy])([^aeiouy])/, position: 1 },
+
+  // Regla 3: Dividir antes de sufijos comunes
+  { pattern: /(.*)(tion|sion|cian|ture|sure)$/, position: -3 },
+  { pattern: /(.*)(able|ible|ance|ence|ment|ness)$/, position: -4 },
+  { pattern: /(.*)(ing|est|ful|ive|ous|ial|ian)$/, position: -3 },
+
+  // Regla 4: Dividir después de prefijos comunes
+  { pattern: /^(re|pre|de|un|dis|mis)(.*)$/, position: 2 },
+  { pattern: /^(trans|inter|over|under)(.*)$/, position: 5 },
+
+  // Regla 5: Consonante + le al final
+  { pattern: /(.*)([^aeiouy]le)$/, position: -2 },
 ];

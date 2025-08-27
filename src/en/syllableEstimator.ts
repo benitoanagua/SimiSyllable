@@ -6,7 +6,7 @@ import {
   SYLLABLE_EXCEPTIONS,
   SUFFIX_PATTERNS,
   DIPHTHONGS,
-  DIVISION_PATTERNS,
+  DIVISION_RULES,
 } from "./patterns.js";
 
 /**
@@ -23,7 +23,7 @@ export function estimateSyllables(word: string): number {
   let count = 0;
   const vowels = "aeiouy";
 
-  // 1. Contar grupos vocálicos (enfoque mejorado)
+  // 1. Contar grupos vocálicos
   let inVowelGroup = false;
   let vowelGroup = "";
 
@@ -67,7 +67,6 @@ export function estimateSyllables(word: string): number {
 function adjustForDiphthongs(vowelGroup: string, currentCount: number): number {
   if (vowelGroup.length <= 1) return currentCount;
 
-  // Verificar si es un diptongo conocido
   for (const diphthong of DIPHTHONGS) {
     if (vowelGroup.includes(diphthong)) {
       return currentCount - (vowelGroup.length - 1);
@@ -97,39 +96,73 @@ function applySpecialRules(word: string, currentCount: number): number {
 
   // Regla de la 'e' silenciosa al final
   if (word.endsWith("e") && count > 1 && word.length > 2) {
-    // Pero no si termina en "le" después de consonante (adds syllable)
     if (word.endsWith("le") && !"aeiouy".includes(word[word.length - 3])) {
-      count += 1; // table -> ta-ble (2 sílabas)
+      count += 1;
     } else {
-      count -= 1; // like -> lik (1 sílaba)
+      count -= 1;
     }
-  }
-
-  // Regla de consonantes dobles
-  if (/([bcdfghjklmnpqrstvwxyz])\1/.test(word)) {
-    count -= 1;
   }
 
   return Math.max(1, count);
 }
 
 /**
- * División silábica aproximada para inglés
+ * División silábica mejorada para inglés
  */
 export function divideSyllables(word: string): string[] {
   if (!word || word.length <= 3) {
     return [word];
   }
 
-  // Usar patrones de división
-  for (const pattern of DIVISION_PATTERNS) {
-    const match = word.match(pattern);
+  // Intentar con cada regla de división
+  for (const rule of DIVISION_RULES) {
+    const match = word.match(rule.pattern);
     if (match && match[1] && match[2]) {
-      return [match[1], match[2]];
+      let firstPart: string;
+      let secondPart: string;
+
+      if (rule.position > 0) {
+        // División por posición absoluta
+        firstPart = word.slice(0, rule.position);
+        secondPart = word.slice(rule.position);
+      } else {
+        // División por posición desde el final
+        firstPart = word.slice(0, word.length + rule.position);
+        secondPart = word.slice(word.length + rule.position);
+      }
+
+      // Verificar que ambas partes tengan al menos una vocal
+      if (hasVowel(firstPart) && hasVowel(secondPart)) {
+        // Dividir recursivamente si es necesario
+        if (firstPart.length > 3) {
+          const firstSyllables = divideSyllables(firstPart);
+          const secondSyllables = divideSyllables(secondPart);
+          return [...firstSyllables, ...secondSyllables];
+        }
+        return [firstPart, secondPart];
+      }
     }
   }
 
-  // Dividir por la mitad como fallback
+  // Fallback: dividir después de la primera vocal
+  for (let i = 1; i < word.length - 1; i++) {
+    if ("aeiouy".includes(word[i]) && !"aeiouy".includes(word[i + 1])) {
+      const firstPart = word.slice(0, i + 1);
+      const secondPart = word.slice(i + 1);
+      if (hasVowel(firstPart) && hasVowel(secondPart)) {
+        return [firstPart, secondPart];
+      }
+    }
+  }
+
+  // Último recurso: dividir por la mitad
   const mid = Math.floor(word.length / 2);
   return [word.slice(0, mid), word.slice(mid)];
+}
+
+/**
+ * Verifica si una cadena tiene al menos una vocal
+ */
+function hasVowel(str: string): boolean {
+  return /[aeiouy]/.test(str);
 }
