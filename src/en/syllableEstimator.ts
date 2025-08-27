@@ -23,7 +23,7 @@ export function estimateSyllables(word: string): number {
   let count = 0;
   const vowels = "aeiouy";
 
-  // 1. Contar grupos vocálicos
+  // 1. Contar grupos vocálicos (enfoque mejorado)
   let inVowelGroup = false;
   let vowelGroup = "";
 
@@ -110,54 +110,119 @@ function applySpecialRules(word: string, currentCount: number): number {
  * División silábica mejorada para inglés
  */
 export function divideSyllables(word: string): string[] {
-  if (!word || word.length <= 3) {
+  if (!word || word.length <= 2) {
     return [word];
   }
 
-  // Intentar con cada regla de división
-  for (const rule of DIVISION_RULES) {
-    const match = word.match(rule.pattern);
-    if (match && match[1] && match[2]) {
-      let firstPart: string;
-      let secondPart: string;
+  // Primero obtener el número estimado de sílabas
+  const syllableCount = estimateSyllables(word);
 
-      if (rule.position > 0) {
-        // División por posición absoluta
-        firstPart = word.slice(0, rule.position);
-        secondPart = word.slice(rule.position);
-      } else {
-        // División por posición desde el final
-        firstPart = word.slice(0, word.length + rule.position);
-        secondPart = word.slice(word.length + rule.position);
-      }
+  // Si es monosílabo, devolver completo
+  if (syllableCount === 1) {
+    return [word];
+  }
 
-      // Verificar que ambas partes tengan al menos una vocal
-      if (hasVowel(firstPart) && hasVowel(secondPart)) {
-        // Dividir recursivamente si es necesario
-        if (firstPart.length > 3) {
-          const firstSyllables = divideSyllables(firstPart);
-          const secondSyllables = divideSyllables(secondPart);
-          return [...firstSyllables, ...secondSyllables];
-        }
-        return [firstPart, secondPart];
-      }
+  // Para palabras con múltiples sílabas, usar división recursiva
+  return divideWordRecursively(word, syllableCount);
+}
+
+/**
+ * División recursiva de palabras
+ */
+function divideWordRecursively(
+  word: string,
+  targetSyllables: number
+): string[] {
+  if (word.length <= 2 || targetSyllables <= 1) {
+    return [word];
+  }
+
+  // Intentar encontrar el mejor punto de división
+  const divisionPoint = findBestDivisionPoint(word);
+
+  if (divisionPoint === -1) {
+    return [word];
+  }
+
+  const firstPart = word.slice(0, divisionPoint);
+  const secondPart = word.slice(divisionPoint);
+
+  // Calcular cuántas sílabas debería tener cada parte
+  const firstSyllables = estimateSyllables(firstPart);
+  const secondSyllables = estimateSyllables(secondPart);
+
+  // Si la división es razonable, proceder recursivamente
+  if (firstSyllables >= 1 && secondSyllables >= 1) {
+    const firstDivision = divideWordRecursively(firstPart, firstSyllables);
+    const secondDivision = divideWordRecursively(secondPart, secondSyllables);
+
+    return [...firstDivision, ...secondDivision];
+  }
+
+  return [word];
+}
+
+/**
+ * Encuentra el mejor punto de división para una palabra
+ */
+function findBestDivisionPoint(word: string): number {
+  const vowels = "aeiouy";
+
+  // Prioridad 1: Dividir después de vocal antes de consonante+vocal (VC-CV)
+  for (let i = 1; i < word.length - 2; i++) {
+    if (
+      vowels.includes(word[i]) &&
+      !vowels.includes(word[i + 1]) &&
+      vowels.includes(word[i + 2])
+    ) {
+      return i + 1;
     }
   }
 
-  // Fallback: dividir después de la primera vocal
+  // Prioridad 2: Dividir entre consonantes dobles
   for (let i = 1; i < word.length - 1; i++) {
-    if ("aeiouy".includes(word[i]) && !"aeiouy".includes(word[i + 1])) {
-      const firstPart = word.slice(0, i + 1);
-      const secondPart = word.slice(i + 1);
-      if (hasVowel(firstPart) && hasVowel(secondPart)) {
-        return [firstPart, secondPart];
-      }
+    if (word[i] === word[i + 1] && !vowels.includes(word[i])) {
+      return i + 1;
     }
   }
 
-  // Último recurso: dividir por la mitad
-  const mid = Math.floor(word.length / 2);
-  return [word.slice(0, mid), word.slice(mid)];
+  // Prioridad 3: Dividir antes de sufijos comunes
+  const suffixPatterns = [
+    /(tion|sion|cian)$/,
+    /(ture|sure)$/,
+    /(able|ible|ance|ence|ment|ness)$/,
+    /(ing|est|ful|ive|ous|ial|ian)$/,
+    /(ed|es|er|ly)$/,
+  ];
+
+  for (const pattern of suffixPatterns) {
+    const match = word.match(pattern);
+    if (match) {
+      return word.length - match[1].length;
+    }
+  }
+
+  // Prioridad 4: Dividir después de prefijos comunes
+  const prefixPatterns = [
+    /^(re|pre|de|un|dis|mis)/,
+    /^(trans|inter|over|under)/,
+  ];
+
+  for (const pattern of prefixPatterns) {
+    const match = word.match(pattern);
+    if (match) {
+      return match[1].length;
+    }
+  }
+
+  // Prioridad 5: Dividir después de la primera vocal
+  for (let i = 0; i < word.length; i++) {
+    if (vowels.includes(word[i]) && i < word.length - 1) {
+      return i + 1;
+    }
+  }
+
+  return -1; // No se encontró punto de división adecuado
 }
 
 /**
