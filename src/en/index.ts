@@ -1,4 +1,4 @@
-import { divideIntoSyllablesEn } from "./syllableDivider.js";
+import { estimateSyllables, divideSyllables } from "./syllableEstimator.js";
 import { normalizeEnglishWord, isEmpty } from "./normalizer.js";
 
 /**
@@ -12,16 +12,15 @@ export function countEn(word: string): number {
   }
 
   try {
-    const syllables = divideIntoSyllablesEn(processedWord);
-    return syllables.length;
+    return estimateSyllables(processedWord);
   } catch (error) {
     console.warn(`Error processing word "${word}":`, error);
-    return estimateSyllables(processedWord); // Fallback heurístico
+    return fallbackEstimate(processedWord);
   }
 }
 
 /**
- * Divide una palabra inglesa en sílabas usando aproximación fonética
+ * Divide una palabra inglesa en sílabas
  */
 export function syllabifyEn(word: string): string[] {
   const processedWord = normalizeEnglishWord(word);
@@ -31,20 +30,20 @@ export function syllabifyEn(word: string): string[] {
   }
 
   try {
-    return divideIntoSyllablesEn(processedWord);
+    return divideSyllables(processedWord);
   } catch (error) {
-    console.warn(`Error processing word "${word}":`, error);
-    return [processedWord]; // Fallback seguro
+    console.warn(`Error dividing word "${word}":`, error);
+    return [processedWord];
   }
 }
 
 /**
- * Estimación heurística de sílabas basada en patrones vocálicos
+ * Estimación de fallback simple
  */
-function estimateSyllables(word: string): number {
-  // Algoritmo simplificado similar a la librería "syllable"
-  let count = 0;
+function fallbackEstimate(word: string): number {
+  // Algoritmo básico de conteo de vocales
   const vowels = "aeiouy";
+  let count = 0;
   let prevCharIsVowel = false;
 
   for (let i = 0; i < word.length; i++) {
@@ -57,11 +56,6 @@ function estimateSyllables(word: string): number {
 
     prevCharIsVowel = isVowel;
   }
-
-  // Ajustes para casos especiales
-  if (word.endsWith("e") && count > 1) count--; // silent e
-  if (word.endsWith("le") && !vowels.includes(word[word.length - 3])) count++; // consonant+le
-  if (word.includes("ia")) count++; // ia usually adds a syllable
 
   return Math.max(1, count);
 }
