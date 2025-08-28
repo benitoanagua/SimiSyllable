@@ -1,38 +1,37 @@
-/**
- * Clasificador de vocales y grupos vocálicos para el silabeador español
- */
-
 import { VowelGroup } from "./types.js";
 
-const STRONG_VOWELS = new Set(["a", "e", "o"]);
-const WEAK_VOWELS = new Set(["i", "u"]);
-const ACCENTED_WEAK = new Set(["í", "ú"]);
-const ACCENTED_STRONG = new Set(["á", "é", "ó"]);
+const STRONG_VOWELS_SET = new Set(["a", "e", "o", "á", "é", "ó"]);
+const WEAK_VOWELS_SET = new Set(["i", "u", "í", "ú", "ü"]);
+const ACCENTED_WEAK_SET = new Set(["í", "ú"]);
 const DIERESIS_VOWELS = new Set(["ü"]);
 
 /**
  * Determina si una vocal es fuerte (a, e, o)
  */
 export function isStrongVowel(char: string): boolean {
-  return STRONG_VOWELS.has(char) || ACCENTED_STRONG.has(char);
+  return STRONG_VOWELS_SET.has(char.toLowerCase());
 }
 
 /**
- * Determina si una vocal es débil (i, u)
+ * Determina si una vocal es débil (i, u, ü)
  */
 export function isWeakVowel(char: string): boolean {
-  return (
-    WEAK_VOWELS.has(char) ||
-    ACCENTED_WEAK.has(char) ||
-    DIERESIS_VOWELS.has(char)
-  );
+  const lowerChar = char.toLowerCase();
+  return WEAK_VOWELS_SET.has(lowerChar);
 }
 
 /**
  * Determina si una vocal débil tiene acento tónico (í, ú)
  */
 export function isAccentedWeakVowel(char: string): boolean {
-  return ACCENTED_WEAK.has(char);
+  return ACCENTED_WEAK_SET.has(char.toLowerCase());
+}
+
+/**
+ * Determina si es diéresis (ü)
+ */
+export function isDieresis(char: string): boolean {
+  return char.toLowerCase() === "ü";
 }
 
 /**
@@ -69,6 +68,15 @@ export function analyzeVowelGroup(vowelGroup: string): VowelGroup {
 function analyzeTwoVowels(vowels: string): VowelGroup {
   const [v1, v2] = vowels;
 
+  // Caso especial: diéresis (ü) siempre forma diptongo con la vocal siguiente
+  if (isDieresis(v1) || isDieresis(v2)) {
+    return {
+      text: vowels,
+      type: "diphthong",
+      syllableCount: 1,
+    };
+  }
+
   // Caso 1: Vocal débil acentuada + cualquier otra = hiato
   if (isAccentedWeakVowel(v1) || isAccentedWeakVowel(v2)) {
     return {
@@ -97,6 +105,23 @@ function analyzeTwoVowels(vowels: string): VowelGroup {
 
 function analyzeThreeVowels(vowels: string): VowelGroup {
   const [v1, v2, v3] = vowels;
+
+  // Casos especiales con diéresis - la diéresis siempre forma diptongo
+  if (isDieresis(v1) || isDieresis(v2) || isDieresis(v3)) {
+    // Casos como "güe", "güi" deben mantenerse como una unidad
+    if (isDieresis(v2)) {
+      return {
+        text: vowels,
+        type: "diphthong",
+        syllableCount: 1,
+      };
+    }
+    return {
+      text: vowels,
+      type: "diphthong",
+      syllableCount: 1,
+    };
+  }
 
   // Si hay vocal débil acentuada, dividir en esa posición
   if (isAccentedWeakVowel(v1)) {
@@ -163,6 +188,11 @@ function analyzeComplexVowelGroup(vowels: string): VowelGroup {
   for (let i = 0; i < vowels.length - 1; i++) {
     const current = vowels[i];
     const next = vowels[i + 1];
+
+    // La diéresis no rompe diptongos
+    if (isDieresis(current) || isDieresis(next)) {
+      continue;
+    }
 
     // División por vocal débil acentuada
     if (isAccentedWeakVowel(current) || isAccentedWeakVowel(next)) {

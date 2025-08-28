@@ -68,8 +68,8 @@ describe("Contraste diptongos vs hiatos", () => {
 describe("Casos con ü (diéresis)", () => {
   test("diéresis forma diptongo con vocal siguiente", () => {
     expect(countEs("pingüino")).toBe(3); // pin-güi-no (güi es diptongo)
-    // expect(countEs("cigüeña")).toBe(3); // ci-güe-ña (güe es diptongo)
-    // expect(countEs("argüir")).toBe(3); // ar-gü-ir
+    expect(countEs("cigüeña")).toBe(3); // ci-güe-ña (güe es diptongo)
+    expect(countEs("argüir")).toBe(3); // ar-gü-ir
 
     // Casos adicionales con diéresis
     expect(countEs("vergüenza")).toBe(3); // ver-güen-za
@@ -77,7 +77,7 @@ describe("Casos con ü (diéresis)", () => {
 
     // Verificar división silábica
     expect(syllabifyEs("pingüino")).toEqual(["pin", "güi", "no"]);
-    // expect(syllabifyEs("cigüeña")).toEqual(["ci", "güe", "ña"]);
+    expect(syllabifyEs("cigüeña")).toEqual(["ci", "güe", "ña"]);
   });
 });
 
@@ -127,10 +127,10 @@ describe("Casos edge y manejo de errores", () => {
 
   test("palabras con caracteres mixtos", () => {
     expect(countEs("hola123")).toBe(2); // se limpia a "hola"
-    // expect(countEs("¡España!")).toBe(3); // se limpia a "españa"
-    // expect(countEs("niño-niña")).toBe(4); // se limpia a "niñoniña"
+    expect(countEs("¡España!")).toBe(3); // se limpia a "españa"
+    expect(countEs("niño-niña")).toBe(4); // se limpia a "niñoniña"
 
-    // expect(syllabifyEs("¡Español!")).toEqual(["es", "pa", "ñol"]);
+    expect(syllabifyEs("¡Español!")).toEqual(["es", "pa", "ñol"]);
   });
 
   test("monosílabos", () => {

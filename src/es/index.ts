@@ -1,4 +1,4 @@
-import { divideIntoSyllables } from "./syllableDivider.js";
+import { estimateSyllables, divideSyllables } from "./syllableEstimator.js";
 import {
   normalizeSpanishWord,
   isEmpty,
@@ -7,7 +7,6 @@ import {
 
 /**
  * Cuenta las sílabas de una palabra en español
- *
  * @param word - Palabra a analizar
  * @param autoAccent - Si debe intentar añadir acentos automáticamente (experimental)
  */
@@ -24,16 +23,17 @@ export function countEs(word: string, autoAccent: boolean = false): number {
   }
 
   try {
-    const syllables = divideIntoSyllables(processedWord);
-    return syllables.length;
+    return estimateSyllables(processedWord);
   } catch (error) {
-    console.warn(`Error processing word "${word}":`, error);
-    return 1; // Fallback seguro
+    console.warn(`Error procesando palabra "${word}":`, error);
+    return fallbackEstimate(processedWord);
   }
 }
 
 /**
- * Divide una palabra española en sílabas y las devuelve como array
+ * Divide una palabra española en sílabas
+ * @param word - Palabra a dividir
+ * @param autoAccent - Si debe intentar añadir acentos automáticamente (experimental)
  */
 export function syllabifyEs(
   word: string,
@@ -45,14 +45,37 @@ export function syllabifyEs(
     return [];
   }
 
+  // Experimental: añadir acentos automáticamente
   if (autoAccent) {
     processedWord = addMissingAccents(processedWord);
   }
 
   try {
-    return divideIntoSyllables(processedWord);
+    return divideSyllables(processedWord);
   } catch (error) {
-    console.warn(`Error processing word "${word}":`, error);
-    return [processedWord]; // Fallback seguro
+    console.warn(`Error dividiendo palabra "${word}":`, error);
+    return [processedWord];
   }
+}
+
+/**
+ * Estimación de fallback simple
+ */
+function fallbackEstimate(word: string): number {
+  const vowels = "aeiouáéíóúü";
+  let count = 0;
+  let prevCharIsVowel = false;
+
+  for (let i = 0; i < word.length; i++) {
+    const char = word[i];
+    const isVowel = vowels.includes(char);
+
+    if (isVowel && !prevCharIsVowel) {
+      count++;
+    }
+
+    prevCharIsVowel = isVowel;
+  }
+
+  return Math.max(1, count);
 }

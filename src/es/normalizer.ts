@@ -3,13 +3,28 @@
  */
 
 /**
- * Normaliza una palabra manteniendo todos los acentos y diéresis
+ * Normaliza una palabra preservando las mayúsculas iniciales cuando corresponde
  */
 export function normalizeSpanishWord(word: string): string {
-  return word
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-záéíóúüñ]/g, ""); // Solo letras españolas con acentos
+  const trimmed = word.trim();
+  if (!trimmed) return "";
+
+  // Limpiar caracteres no válidos pero preservar estructura
+  const cleaned = trimmed.replace(/[^a-záéíóúüñA-ZÁÉÍÓÚÜÑ]/g, "");
+
+  if (!cleaned) return "";
+
+  // Determinar si la primera letra original era mayúscula
+  const firstOriginalChar = trimmed[0];
+  const shouldPreserveCase = /[A-ZÁÉÍÓÚÜÑ]/.test(firstOriginalChar);
+
+  if (shouldPreserveCase) {
+    // Preservar la primera letra en mayúscula, el resto en minúsculas
+    return cleaned[0].toUpperCase() + cleaned.slice(1).toLowerCase();
+  } else {
+    // Todo en minúsculas
+    return cleaned.toLowerCase();
+  }
 }
 
 /**
