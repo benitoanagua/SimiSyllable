@@ -43,6 +43,19 @@ export const SYLLABLE_EXCEPTIONS = new Map([
   ["y", 1],
   ["oh", 1],
   ["ah", 1],
+  // Añadir excepciones para palabras con diéresis que forman hiato
+  ["argüir", 3],
+  ["argüís", 3],
+  ["argüído", 4],
+  ["destrüir", 3],
+  ["destrüís", 3],
+  ["destrüído", 4],
+  ["construír", 3],
+  ["construís", 3],
+  ["construído", 4],
+  ["incluír", 3],
+  ["incluís", 3],
+  ["incluído", 4],
 ]);
 
 /**
