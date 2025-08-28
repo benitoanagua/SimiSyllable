@@ -1,5 +1,8 @@
 # SimiSyllable 📖
 
+[![npm version](https://badge.fury.io/js/simi-syllable.svg)](https://badge.fury.io/js/simi-syllable)
+[![npm downloads](https://img.shields.io/npm/dm/simi-syllable.svg)](https://www.npmjs.com/package/simi-syllable)
+
 **SimiSyllable** is a lightweight and accurate JavaScript/TypeScript library for counting and dividing syllables in English and Spanish. It uses advanced phonetic algorithms to provide precise results without the need for extensive dictionaries.
 
 ## Features ✨

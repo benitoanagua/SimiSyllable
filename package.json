@@ -2,7 +2,7 @@
   "name": "simi-syllable",
   "version": "1.0.0",
   "type": "module",
-  "description": "Advanced syllable counter for English and Spanish using linguistic databases",
+  "description": "Lightweight and accurate JavaScript/TypeScript library for counting and dividing syllables in English and Spanish",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -13,27 +13,47 @@
   },
   "files": [
     "dist",
-    "data"
+    "data",
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsc",
     "test": "vitest",
-    "prepublishOnly": "npm run build && npm test",
-    "postinstall": "npm run download-dicts"
+    "test:coverage": "vitest --coverage",
+    "prepublishOnly": "npm run build && npm test"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/benitoanagua/SimiSyllable.git"
+  },
+  "homepage": "https://github.com/benitoanagua/SimiSyllable#readme",
+  "bugs": {
+    "url": "https://github.com/benitoanagua/SimiSyllable/issues"
+  },
+  "keywords": [
+    "syllable",
+    "counter",
+    "divider",
+    "english",
+    "spanish",
+    "linguistics",
+    "phonetic",
+    "typescript",
+    "javascript",
+    "hiatus",
+    "diphthong",
+    "triphthong",
+    "multilingual"
+  ],
+  "author": "benitoanagua <benito.anagua@gmail.com>",
+  "license": "MIT",
   "devDependencies": {
     "@types/node": "^22.10.2",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"
   },
-  "keywords": [
-    "syllable",
-    "counter",
-    "english",
-    "spanish",
-    "linguistics",
-    "cmudict"
-  ],
-  "author": "Tu nombre",
-  "license": "MIT"
+  "engines": {
+    "node": ">=16.0.0"
+  }
 }
