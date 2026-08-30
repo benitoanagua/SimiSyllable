@@ -6,7 +6,7 @@ export const config: Config = {
   globalStyle: 'src/styles/global.css',
   outputTargets: [
     { type: 'dist' },
-    { type: 'dist-custom-elements', customElementsExportBehavior: 'auto-define-custom-elements' },
+    { type: 'dist-custom-elements', customElementsExportBehavior: 'single-export-module' },
   ],
   extras: { enableImportInjection: true },
 };

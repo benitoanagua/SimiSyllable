@@ -7,7 +7,6 @@ export const HandheldVue: Plugin = {
   },
 };
 
-export const registerHandheld = () => HandheldVue;
 
 declare module 'vue' {
   interface GlobalComponents {

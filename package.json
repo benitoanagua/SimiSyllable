@@ -22,7 +22,8 @@
     "format": "prettier --write .",
     "check:icons": "node tooling/validation/no-legacy-icons.mjs",
     "test:contracts": "pnpm --filter @handheld/testing test:contracts",
-    "test:a11y": "pnpm --filter @handheld/testing test:a11y"
+    "test:a11y": "pnpm --filter @handheld/testing test:a11y",
+    "format:repair": "prettier --write ."
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.0",
@@ -35,10 +36,5 @@
     "storybook": "^8.6.18",
     "turbo": "^2.5.0",
     "typescript": "^5.7.0"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
   }
 }
