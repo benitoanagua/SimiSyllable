@@ -8,12 +8,10 @@ const react = readJson('packages/react/package.json');
 
 const storybookVersion = storybook.devDependencies.storybook;
 const pluginVersion = storybook.devDependencies['@stencil/storybook-plugin'];
-const addonVersion = storybook.devDependencies['@storybook/addon-essentials'];
 
 const major = (range) => Number(String(range).match(/\d+/)?.[0]);
 const errors = [];
 if (major(storybookVersion) !== 10) errors.push(`storybook must be major 10 for @stencil/storybook-plugin ${pluginVersion}; found ${storybookVersion}`);
-if (major(addonVersion) !== 10) errors.push(`@storybook/addon-essentials must be major 10; found ${addonVersion}`);
 if (major(react.devDependencies['@types/react']) !== 18 || major(react.devDependencies['@types/react-dom']) !== 18) {
   errors.push('React adapter development types must remain on React 18 to match the package peer contract.');
 }

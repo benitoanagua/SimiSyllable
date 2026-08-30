@@ -25,7 +25,8 @@
     "test:a11y": "pnpm --filter @handheld/testing test:a11y",
     "format:repair": "prettier --write .",
     "check:framework": "node tooling/validation/no-lit.mjs",
-    "check:dependencies": "node tooling/validation/dependency-consistency.mjs"
+    "check:dependencies": "node tooling/validation/dependency-consistency.mjs",
+    "check:api": "node tooling/validation/public-api.mjs"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.0",
