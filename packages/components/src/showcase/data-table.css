@@ -1,8 +1,29 @@
-.hh-data-table { overflow:auto; border:1px solid var(--hh-color-border); border-radius:var(--hh-radius-lg); background:var(--hh-color-surface); }
-.hh-data-table:focus-visible { outline:2px solid var(--hh-color-action); outline-offset:2px; }
-.hh-data-table table { width:100%; min-width:520px; border-collapse:collapse; color:var(--hh-color-text); }
-.hh-data-table caption { padding:14px 16px; text-align:left; font-weight:700; }
-.hh-data-table th,.hh-data-table td { padding:12px 16px; border-top:1px solid var(--hh-color-border); text-align:left; white-space:nowrap; }
-.hh-data-table th { color:var(--hh-color-text-muted); font-size:.75rem; text-transform:uppercase; letter-spacing:.06em; }
-.hh-data-table .numeric { text-align:right; font-variant-numeric:tabular-nums; }
-.hh-data-table tbody tr:hover { background:var(--hh-color-background); }
+.hh-data-table-wrapper { display: flex; flex-direction: column; gap: var(--hh-space-3); }
+.hh-data-table__toolbar { max-width: 20rem; }
+.hh-data-table { overflow: auto; border: 1px solid var(--hh-color-border); border-radius: var(--hh-radius-lg); background: var(--hh-color-surface); }
+.hh-data-table:focus-visible { outline: 2px solid var(--hh-color-action); outline-offset: 2px; }
+.hh-data-table table { width: 100%; min-width: 520px; border-collapse: collapse; color: var(--hh-color-text); }
+.hh-data-table caption { padding-block: 14px; padding-inline: 16px; text-align: start; font-weight: 700; }
+.hh-data-table th, .hh-data-table td { padding-block: 12px; padding-inline: 16px; border-block-start: 1px solid var(--hh-color-border); text-align: start; white-space: nowrap; }
+.hh-data-table th { color: var(--hh-color-text-muted); font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; }
+.hh-data-table .numeric { text-align: end; font-variant-numeric: tabular-nums; }
+.hh-data-table tbody tr:hover { background: var(--hh-color-background); }
+.hh-data-table__empty { text-align: center; color: var(--hh-color-text-muted); padding-block: var(--hh-space-6); }
+.hh-data-table__footer { display: flex; justify-content: flex-end; }
+
+.hh-data-table__sort {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--hh-space-1);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+.hh-data-table__sort:hover { color: var(--hh-color-text); }
+.hh-data-table__sort:focus-visible { outline: none; box-shadow: var(--hh-focus-ring); }
+.hh-data-table__sort hh-icon { width: 0.875rem; height: 0.875rem; }

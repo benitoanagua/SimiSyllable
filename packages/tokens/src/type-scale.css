@@ -1,0 +1,69 @@
+/*
+ * Utility classes for the type scale defined in tokens.css.
+ * Optional — components/products can also reference --hh-type-*-size etc.
+ * directly, but these classes give product teams a documented, Material
+ * Type Scale / Carbon Type–style scale they can reach for without
+ * re-deriving font-size + line-height + weight + letter-spacing by hand.
+ */
+.hh-type-display {
+  font-size: var(--hh-type-display-size);
+  line-height: var(--hh-type-display-line-height);
+  font-weight: var(--hh-type-display-weight);
+  letter-spacing: var(--hh-type-display-letter-spacing);
+}
+.hh-type-h1 {
+  font-size: var(--hh-type-h1-size);
+  line-height: var(--hh-type-h1-line-height);
+  font-weight: var(--hh-type-h1-weight);
+  letter-spacing: var(--hh-type-h1-letter-spacing);
+}
+.hh-type-h2 {
+  font-size: var(--hh-type-h2-size);
+  line-height: var(--hh-type-h2-line-height);
+  font-weight: var(--hh-type-h2-weight);
+  letter-spacing: var(--hh-type-h2-letter-spacing);
+}
+.hh-type-h3 {
+  font-size: var(--hh-type-h3-size);
+  line-height: var(--hh-type-h3-line-height);
+  font-weight: var(--hh-type-h3-weight);
+  letter-spacing: var(--hh-type-h3-letter-spacing);
+}
+.hh-type-h4 {
+  font-size: var(--hh-type-h4-size);
+  line-height: var(--hh-type-h4-line-height);
+  font-weight: var(--hh-type-h4-weight);
+  letter-spacing: var(--hh-type-h4-letter-spacing);
+}
+.hh-type-body-lg {
+  font-size: var(--hh-type-body-lg-size);
+  line-height: var(--hh-type-body-lg-line-height);
+  font-weight: var(--hh-type-body-lg-weight);
+}
+.hh-type-body-md {
+  font-size: var(--hh-type-body-md-size);
+  line-height: var(--hh-type-body-md-line-height);
+  font-weight: var(--hh-type-body-md-weight);
+}
+.hh-type-body-sm {
+  font-size: var(--hh-type-body-sm-size);
+  line-height: var(--hh-type-body-sm-line-height);
+  font-weight: var(--hh-type-body-sm-weight);
+}
+.hh-type-label {
+  font-size: var(--hh-type-label-size);
+  line-height: var(--hh-type-label-line-height);
+  font-weight: var(--hh-type-label-weight);
+}
+.hh-type-caption {
+  font-size: var(--hh-type-caption-size);
+  line-height: var(--hh-type-caption-line-height);
+  font-weight: var(--hh-type-caption-weight);
+}
+.hh-type-overline {
+  font-size: var(--hh-type-overline-size);
+  line-height: var(--hh-type-overline-line-height);
+  font-weight: var(--hh-type-overline-weight);
+  letter-spacing: var(--hh-type-overline-letter-spacing);
+  text-transform: uppercase;
+}

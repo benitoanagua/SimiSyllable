@@ -14,3 +14,16 @@
 | `hh-card` | article/button pattern | ✓ | ✓ | n/a | n/a | ✓ | ✓ |
 | `hh-badge` | status text | n/a | n/a | n/a | n/a | ✓ | ✓ |
 | `hh-spinner` | status | n/a | n/a | ✓ | n/a | ✓ | ✓ |
+| `hh-progress` | progressbar | n/a | n/a | ✓ | n/a | ✓ | ✓ |
+| `hh-skeleton` | status | n/a | n/a | ✓ | n/a | ✓ | ✓ |
+| `hh-toast-region` | status/alert queue | n/a | ✓ (returns focus) | n/a | n/a | ✓ | ✓ |
+| `hh-menu` / `hh-menu-item` | menu/menuitem | ✓ (arrow/Home/End/Esc) | ✓ | n/a | n/a | ✓ | ✓ |
+| `hh-pagination` | nav | ✓ | ✓ | n/a | n/a | ✓ | ✓ |
+| `hh-breadcrumbs` / `hh-breadcrumb-item` | nav/ol | n/a | ✓ | n/a | n/a | ✓ | ✓ |
+| `hh-avatar` | img/text fallback | n/a | n/a | n/a | ✓ (image error) | ✓ | ✓ |
+| `hh-segmented-control` / `hh-segmented-item` | radiogroup/radio | ✓ | ✓ | n/a | n/a | ✓ | ✓ |
+| `hh-slider` | range input | ✓ (native) | ✓ | n/a | n/a | ✓ | ✓ |
+| `hh-combobox` / `hh-combobox-option` | combobox/listbox | ✓ (arrows/Home/End/Enter/Esc) | ✓ | n/a | ✓ | ✓ | ✓ |
+| `hh-date-picker` | dialog/grid | ✓ (arrows/PageUp/PageDown/Home/End) | ✓ (roving tabindex) | n/a | ✓ | ✓ | ✓ |
+| `hh-time-picker` | time input (native) | ✓ (native) | ✓ | n/a | ✓ | ✓ | ✓ |
+| `hh-file-upload` | button + file input | ✓ (Enter/Space + native dialog) | ✓ | n/a | ✓ (type/size validation) | ✓ | ✓ |

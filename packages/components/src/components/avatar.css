@@ -1,0 +1,31 @@
+.hh-avatar {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--hh-color-action-soft);
+  color: var(--hh-color-action);
+  font-weight: var(--hh-font-weight-semibold);
+  flex-shrink: 0;
+}
+.hh-avatar.is-circle { border-radius: var(--hh-radius-pill); }
+.hh-avatar.is-square { border-radius: var(--hh-radius-md); }
+.hh-avatar.is-small { width: 1.75rem; height: 1.75rem; font-size: var(--hh-font-size-xs); }
+.hh-avatar.is-medium { width: 2.5rem; height: 2.5rem; font-size: var(--hh-font-size-sm); }
+.hh-avatar.is-large { width: 3.5rem; height: 3.5rem; font-size: var(--hh-font-size-lg); }
+.hh-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.hh-avatar__initials { display: grid; place-items: center; width: 100%; height: 100%; }
+.hh-avatar__initials hh-icon { width: 60%; height: 60%; }
+.hh-avatar__status {
+  position: absolute;
+  inset-inline-end: -1px;
+  bottom: -1px;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  border: 2px solid var(--hh-color-surface-raised);
+}
+.hh-avatar__status.is-online { background: var(--hh-color-success); }
+.hh-avatar__status.is-busy { background: var(--hh-color-danger); }
+.hh-avatar__status.is-away { background: var(--hh-color-warning); }
+.hh-avatar__status.is-offline { background: var(--hh-color-neutral-500); }

@@ -21,5 +21,22 @@ declare module 'vue' {
     'hh-select': HTMLElement;
     'hh-card': HTMLElement;
     'hh-badge': HTMLElement;
+    'hh-avatar': HTMLElement;
+    'hh-progress': HTMLElement;
+    'hh-skeleton': HTMLElement;
+    'hh-slider': HTMLElement;
+    'hh-pagination': HTMLElement;
+    'hh-breadcrumbs': HTMLElement;
+    'hh-breadcrumb-item': HTMLElement;
+    'hh-menu': HTMLElement;
+    'hh-menu-item': HTMLElement;
+    'hh-segmented-control': HTMLElement;
+    'hh-segmented-item': HTMLElement;
+    'hh-toast-region': HTMLElement;
+    'hh-combobox': HTMLElement;
+    'hh-combobox-option': HTMLElement;
+    'hh-date-picker': HTMLElement;
+    'hh-time-picker': HTMLElement;
+    'hh-file-upload': HTMLElement;
   }
 }

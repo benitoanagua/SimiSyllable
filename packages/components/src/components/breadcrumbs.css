@@ -1,0 +1,10 @@
+.hh-breadcrumbs ol { display: flex; align-items: center; flex-wrap: wrap; gap: var(--hh-space-1); margin: 0; padding: 0; list-style: none; }
+.hh-breadcrumbs__item { display: flex; align-items: center; gap: var(--hh-space-1); }
+.hh-breadcrumbs__item a { color: var(--hh-color-text-muted); text-decoration: none; font-size: var(--hh-type-body-sm-size); }
+.hh-breadcrumbs__item a:hover { color: var(--hh-color-action); text-decoration: underline; }
+.hh-breadcrumbs__item span[aria-current] { color: var(--hh-color-text); font-weight: var(--hh-font-weight-medium); font-size: var(--hh-type-body-sm-size); }
+.hh-breadcrumbs__sep { width: 1rem; height: 1rem; color: var(--hh-color-text-disabled); }
+.hh-breadcrumbs__ellipsis-item { display: flex; align-items: center; gap: var(--hh-space-1); }
+.hh-breadcrumbs__ellipsis { border: 0; background: transparent; color: var(--hh-color-text-muted); cursor: pointer; font: inherit; padding: 0 var(--hh-space-1); }
+.hh-breadcrumbs__ellipsis:hover { color: var(--hh-color-action); }
+.hh-breadcrumbs__ellipsis:focus-visible { outline: none; box-shadow: var(--hh-focus-ring); }

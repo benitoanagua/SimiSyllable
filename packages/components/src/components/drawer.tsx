@@ -5,7 +5,12 @@ export class HhDrawer {
   @Element() host!: HTMLElement;
   @Prop({ mutable: true }) open = false;
   @Prop() label = '';
-  @Prop() side: 'left' | 'right' = 'right';
+  /**
+   * 'start'/'end' are logical and flip with document direction (recommended
+   * for RTL support). 'left'/'right' are kept for backwards compatibility
+   * and always render on that literal physical side regardless of `dir`.
+   */
+  @Prop() side: 'left' | 'right' | 'start' | 'end' = 'end';
   @Prop() closeOnEscape = true;
   @Event() hhOpen!: EventEmitter<void>;
   @Event() hhClose!: EventEmitter<void>;

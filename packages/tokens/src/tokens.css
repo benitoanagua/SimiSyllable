@@ -68,6 +68,64 @@
   --hh-line-height-tight: 1.2;
   --hh-line-height-normal: 1.5;
   --hh-line-height-relaxed: 1.7;
+  --hh-letter-spacing-tight: -0.01em;
+  --hh-letter-spacing-normal: 0;
+  --hh-letter-spacing-wide: 0.02em;
+  --hh-letter-spacing-overline: 0.08em;
+
+  /* Type scale — composed roles, not just raw sizes.
+     Use these (via the .hh-type-* utility classes in styles/type-scale.css,
+     or by referencing the -size/-line-height/-weight triplet directly)
+     instead of reaching for --hh-font-size-* in component/product code. */
+  --hh-type-display-size: 3rem;
+  --hh-type-display-line-height: 1.1;
+  --hh-type-display-weight: var(--hh-font-weight-bold);
+  --hh-type-display-letter-spacing: var(--hh-letter-spacing-tight);
+
+  --hh-type-h1-size: 2.25rem;
+  --hh-type-h1-line-height: 1.2;
+  --hh-type-h1-weight: var(--hh-font-weight-bold);
+  --hh-type-h1-letter-spacing: var(--hh-letter-spacing-tight);
+
+  --hh-type-h2-size: 1.75rem;
+  --hh-type-h2-line-height: 1.25;
+  --hh-type-h2-weight: var(--hh-font-weight-semibold);
+  --hh-type-h2-letter-spacing: var(--hh-letter-spacing-tight);
+
+  --hh-type-h3-size: 1.375rem;
+  --hh-type-h3-line-height: 1.3;
+  --hh-type-h3-weight: var(--hh-font-weight-semibold);
+  --hh-type-h3-letter-spacing: var(--hh-letter-spacing-normal);
+
+  --hh-type-h4-size: 1.125rem;
+  --hh-type-h4-line-height: 1.35;
+  --hh-type-h4-weight: var(--hh-font-weight-semibold);
+  --hh-type-h4-letter-spacing: var(--hh-letter-spacing-normal);
+
+  --hh-type-body-lg-size: 1.125rem;
+  --hh-type-body-lg-line-height: var(--hh-line-height-relaxed);
+  --hh-type-body-lg-weight: var(--hh-font-weight-regular);
+
+  --hh-type-body-md-size: 1rem;
+  --hh-type-body-md-line-height: var(--hh-line-height-normal);
+  --hh-type-body-md-weight: var(--hh-font-weight-regular);
+
+  --hh-type-body-sm-size: 0.875rem;
+  --hh-type-body-sm-line-height: var(--hh-line-height-normal);
+  --hh-type-body-sm-weight: var(--hh-font-weight-regular);
+
+  --hh-type-label-size: 0.875rem;
+  --hh-type-label-line-height: var(--hh-line-height-tight);
+  --hh-type-label-weight: var(--hh-font-weight-medium);
+
+  --hh-type-caption-size: 0.75rem;
+  --hh-type-caption-line-height: var(--hh-line-height-tight);
+  --hh-type-caption-weight: var(--hh-font-weight-regular);
+
+  --hh-type-overline-size: 0.75rem;
+  --hh-type-overline-line-height: var(--hh-line-height-tight);
+  --hh-type-overline-weight: var(--hh-font-weight-semibold);
+  --hh-type-overline-letter-spacing: var(--hh-letter-spacing-overline);
 
   /* Motion. */
   --hh-motion-fast: 120ms;
@@ -99,4 +157,41 @@
   --hh-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.06);
   --hh-shadow-md: 0 8px 24px rgb(0 0 0 / 0.10);
   --hh-shadow-lg: 0 16px 40px rgb(0 0 0 / 0.16);
+}
+
+/* Breakpoints / grid.
+   CSS custom properties cannot be interpolated inside @media conditions,
+   so these are also exported as plain numbers from @handheld/tokens
+   (see src/breakpoints.ts) for use in JS (matchMedia, ResizeObserver
+   thresholds, etc). Treat the numeric values below and in breakpoints.ts
+   as the single source of truth — if one changes, change both. */
+:root {
+  --hh-breakpoint-xs: 0px;
+  --hh-breakpoint-sm: 480px;
+  --hh-breakpoint-md: 768px;
+  --hh-breakpoint-lg: 1024px;
+  --hh-breakpoint-xl: 1280px;
+  --hh-breakpoint-2xl: 1536px;
+
+  --hh-grid-columns: 12;
+  --hh-grid-gutter: var(--hh-space-4);
+  --hh-grid-margin-sm: var(--hh-space-4);
+  --hh-grid-margin-lg: var(--hh-space-8);
+  --hh-container-max-width: 1280px;
+}
+
+/* Z-index scale. Every stacking context in the system (dropdown, overlay,
+   drawer, modal, toast, tooltip) must reference one of these — never a
+   hardcoded number — so ordering stays centralized and predictable as
+   new layered components (menu, toast, combobox popover, ...) are added. */
+:root {
+  --hh-z-base: 0;
+  --hh-z-raised: 10;
+  --hh-z-sticky: 100;
+  --hh-z-dropdown: 500;
+  --hh-z-overlay: 800;
+  --hh-z-drawer: 900;
+  --hh-z-modal: 1000;
+  --hh-z-toast: 1100;
+  --hh-z-tooltip: 1200;
 }

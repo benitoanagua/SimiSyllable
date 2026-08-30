@@ -1,0 +1,22 @@
+.hh-segmented-control {
+  display: inline-flex;
+  padding: 2px;
+  border-radius: var(--hh-radius-md);
+  background: var(--hh-color-surface);
+  gap: 2px;
+}
+.hh-segmented-item {
+  padding: var(--hh-space-1) var(--hh-space-3);
+  border: 0;
+  border-radius: calc(var(--hh-radius-md) - 2px);
+  background: transparent;
+  color: var(--hh-color-text-muted);
+  font: inherit;
+  font-size: var(--hh-type-body-sm-size);
+  font-weight: var(--hh-font-weight-medium);
+  cursor: pointer;
+}
+.hh-segmented-item:hover:not(:disabled):not(.is-selected) { color: var(--hh-color-text); }
+.hh-segmented-item:focus-visible { outline: none; box-shadow: var(--hh-focus-ring); }
+.hh-segmented-item.is-selected { background: var(--hh-color-surface-raised); color: var(--hh-color-text); box-shadow: var(--hh-shadow-sm); }
+.hh-segmented-item:disabled { color: var(--hh-color-text-disabled); cursor: not-allowed; }

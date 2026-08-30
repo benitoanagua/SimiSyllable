@@ -1,0 +1,17 @@
+.hh-skeleton {
+  display: block;
+  background: var(--hh-color-surface);
+  background-image: linear-gradient(90deg, var(--hh-color-surface) 0%, var(--hh-color-neutral-100) 50%, var(--hh-color-surface) 100%);
+  background-size: 200% 100%;
+}
+.hh-skeleton.is-text { width: 100%; height: 1em; border-radius: var(--hh-radius-sm); }
+.hh-skeleton.is-circle { width: 2.5rem; height: 2.5rem; border-radius: 50%; }
+.hh-skeleton.is-rect { width: 100%; height: 6rem; border-radius: var(--hh-radius-md); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .hh-skeleton { animation: hh-skeleton-shimmer 1.6s linear infinite; }
+}
+@keyframes hh-skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

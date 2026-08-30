@@ -5,7 +5,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && node -e \"require('node:fs').cpSync('src/data','dist/data',{recursive:true})\"",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "node --test",
     "lint": "node ../../tooling/lint/package-rules.mjs icons"
