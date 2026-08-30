@@ -42,7 +42,15 @@ export class HhCombobox {
   @State() private activeIndex = 0;
   private input?: HTMLInputElement;
   private root?: HTMLElement;
+  private listbox?: HTMLElement;
   private listboxId = '';
+
+  private bindListbox = (el?: HTMLElement) => {
+    if (el === this.listbox) return;
+    this.listbox?.removeEventListener('hhSelect', this.onOptionSelect as EventListener);
+    this.listbox = el;
+    this.listbox?.addEventListener('hhSelect', this.onOptionSelect as EventListener);
+  };
 
   componentWillLoad() {
     this.listboxId = `${this.host.id || 'hh-combobox'}-listbox`;
@@ -54,6 +62,7 @@ export class HhCombobox {
   }
   disconnectedCallback() {
     document.removeEventListener('click', this.onDocumentClick, true);
+    this.listbox?.removeEventListener('hhSelect', this.onOptionSelect as EventListener);
   }
 
   private options(): HTMLElement[] {
@@ -186,7 +195,7 @@ export class HhCombobox {
           />
           {this.value ? <hh-icon-button name="x" label="Clear selection" size="small" onHhPress={this.clear} /> : null}
         </div>
-        <div id={this.listboxId} class="hh-combobox__listbox" role="listbox" hidden={!this.open} onHhSelect={this.onOptionSelect}>
+        <div id={this.listboxId} class="hh-combobox__listbox" role="listbox" hidden={!this.open} ref={(el) => this.bindListbox(el as HTMLElement | undefined)}>
           <slot onSlotchange={this.applyFilter} />
           {visible.length === 0 ? <p class="hh-combobox__empty">{this.noResultsText}</p> : null}
         </div>

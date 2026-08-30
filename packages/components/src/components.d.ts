@@ -8,9 +8,13 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { HhButtonVariant } from "./types";
 import { HhButtonSize } from "./components/button";
 import { HhTableColumn } from "./showcase/data-table";
+import { HhFileUploadError } from "./components/file-upload";
+import { HhToastOptions } from "./components/toast";
 export { HhButtonVariant } from "./types";
 export { HhButtonSize } from "./components/button";
 export { HhTableColumn } from "./showcase/data-table";
+export { HhFileUploadError } from "./components/file-upload";
+export { HhToastOptions } from "./components/toast";
 export namespace Components {
     interface HhAccordion {
         /**
@@ -46,11 +50,65 @@ export namespace Components {
          */
         "tone": 'info' | 'success' | 'warning' | 'danger';
     }
+    interface HhAvatar {
+        /**
+          * @default ''
+         */
+        "name": string;
+        /**
+          * @default 'circle'
+         */
+        "shape": 'circle' | 'square';
+        /**
+          * @default 'medium'
+         */
+        "size": 'small' | 'medium' | 'large';
+        "src"?: string;
+        /**
+          * Optional presence dot.
+         */
+        "status"?: 'online' | 'offline' | 'busy' | 'away';
+    }
     interface HhBadge {
         /**
           * @default 'neutral'
          */
         "tone": 'neutral' | 'info' | 'success' | 'warning' | 'danger';
+    }
+    interface HhBreadcrumbItem {
+        /**
+          * Set automatically by the parent <hh-breadcrumbs> on the last item.
+          * @default false
+         */
+        "current": boolean;
+        /**
+          * @default ''
+         */
+        "href": string;
+    }
+    /**
+     * Wraps slotted `<hh-breadcrumb-item>` children, marking the last item as
+     * the current page and (optionally) collapsing the middle items behind a
+     * clickable ellipsis when there are more than `maxItems`.
+     *   <hh-breadcrumbs max-items="3">
+     *     <hh-breadcrumb-item href="/">Home</hh-breadcrumb-item>
+     *     <hh-breadcrumb-item href="/settings">Settings</hh-breadcrumb-item>
+     *     <hh-breadcrumb-item href="/settings/team">Team</hh-breadcrumb-item>
+     *     <hh-breadcrumb-item>Profile</hh-breadcrumb-item>
+     *   </hh-breadcrumbs>
+     * `shadow: false` means slotted items are real light-DOM children of the
+     * host, so collapsing is done by inserting/removing a real ellipsis <li>
+     * node next to them rather than trying to reorder projected slot content.
+     */
+    interface HhBreadcrumbs {
+        /**
+          * @default 'Breadcrumb'
+         */
+        "label": string;
+        /**
+          * @default 0
+         */
+        "maxItems": number;
     }
     interface HhButton {
         /**
@@ -111,6 +169,93 @@ export namespace Components {
          */
         "value": string;
     }
+    /**
+     * Type-ahead combobox following the WAI-ARIA 1.2 combobox pattern (input
+     * with `role="combobox"` + a `role="listbox"` popup, `aria-activedescendant`
+     * driving keyboard selection rather than moving real DOM focus).
+     *   <hh-combobox label="Country" name="country" value="us">
+     *     <hh-combobox-option value="us">United States</hh-combobox-option>
+     *     <hh-combobox-option value="ca">Canada</hh-combobox-option>
+     *     <hh-combobox-option value="mx">Mexico</hh-combobox-option>
+     *   </hh-combobox>
+     * Filtering is real (substring match against each option's text, live as
+     * you type) — it operates on the actual slotted `<hh-combobox-option>`
+     * elements (toggling `matched`/`active`/`selected` attributes on them, the
+     * same light-DOM-child pattern used by `hh-breadcrumbs`/`hh-segmented-control`)
+     * rather than re-rendering a parallel copy of the options.
+     * Set `allow-custom-value` to let the input's raw text become the value when
+     * it doesn't match any option (e.g. a tags field); otherwise the input
+     * reverts to the last matched option's label on blur/Escape.
+     */
+    interface HhCombobox {
+        /**
+          * @default false
+         */
+        "allowCustomValue": boolean;
+        /**
+          * @default false
+         */
+        "disabled": boolean;
+        /**
+          * @default ''
+         */
+        "error": string;
+        /**
+          * @default ''
+         */
+        "hint": string;
+        /**
+          * @default ''
+         */
+        "label": string;
+        /**
+          * @default ''
+         */
+        "name": string;
+        /**
+          * @default 'No results'
+         */
+        "noResultsText": string;
+        /**
+          * @default ''
+         */
+        "placeholder": string;
+        /**
+          * @default false
+         */
+        "required": boolean;
+        /**
+          * @default ''
+         */
+        "value": string;
+    }
+    interface HhComboboxOption {
+        /**
+          * @default false
+         */
+        "active": boolean;
+        /**
+          * All three are set by the parent <hh-combobox> — presence-based (toggleAttribute), not string values.
+          * @default true
+         */
+        "matched": boolean;
+        /**
+          * @default false
+         */
+        "selected": boolean;
+        /**
+          * @default ''
+         */
+        "value": string;
+    }
+    /**
+     * A real interactive table: click a sortable column header to sort by it
+     * (asc → desc → none), type in the filter box to filter across all column
+     * values, and page through results — not just a static markup demo.
+     * Sorting/filtering/pagination all run client-side over `rows`; for
+     * server-side paging, listen for `hhPageChange`/`hhSortChange`/`hhFilterChange`
+     * and re-fetch instead of relying on the internal state.
+     */
     interface HhDataTable {
         /**
           * @default ''
@@ -121,9 +266,74 @@ export namespace Components {
          */
         "columns": HhTableColumn[];
         /**
+          * @default 'Filter…'
+         */
+        "filterPlaceholder": string;
+        /**
+          * @default false
+         */
+        "filterable": boolean;
+        /**
+          * @default 0
+         */
+        "pageSize": number;
+        /**
           * @default []
          */
         "rows": Record<string, string>[];
+    }
+    /**
+     * Calendar-grid date picker (WAI-ARIA date picker dialog pattern: a text
+     * input + a `role="dialog"` popup containing a `role="grid"` of real day
+     * `<button>`s with roving tabindex — arrow keys move actual DOM focus
+     * between days, not just `aria-activedescendant`).
+     * The stored/emitted `value` is always ISO `yyyy-mm-dd`, matching native
+     * `<input type="date">` semantics, regardless of the `locale` used to
+     * render weekday/month labels in the calendar UI itself — so a Spanish or
+     * French `locale` prop changes what the calendar *looks like* without
+     * changing what other code needs to parse.
+     *   <hh-date-picker label="Fecha de viaje" locale="es-BO" first-day-of-week="1" />
+     */
+    interface HhDatePicker {
+        /**
+          * @default false
+         */
+        "disabled": boolean;
+        /**
+          * @default ''
+         */
+        "error": string;
+        /**
+          * @default 0
+         */
+        "firstDayOfWeek": 0 | 1;
+        /**
+          * @default ''
+         */
+        "hint": string;
+        /**
+          * @default ''
+         */
+        "label": string;
+        "locale"?: string;
+        "max"?: string;
+        "min"?: string;
+        /**
+          * @default ''
+         */
+        "name": string;
+        /**
+          * @default 'YYYY-MM-DD'
+         */
+        "placeholder": string;
+        /**
+          * @default false
+         */
+        "required": boolean;
+        /**
+          * @default ''
+         */
+        "value": string;
     }
     interface HhDialog {
         "close": () => Promise<void>;
@@ -157,9 +367,10 @@ export namespace Components {
         "open": boolean;
         "show": () => Promise<void>;
         /**
-          * @default 'right'
+          * 'start'/'end' are logical and flip with document direction (recommended for RTL support). 'left'/'right' are kept for backwards compatibility and always render on that literal physical side regardless of `dir`.
+          * @default 'end'
          */
-        "side": 'left' | 'right';
+        "side": 'left' | 'right' | 'start' | 'end';
     }
     interface HhEmptyState {
         /**
@@ -170,6 +381,58 @@ export namespace Components {
           * @default ''
          */
         "heading": string;
+    }
+    /**
+     * Real drag-and-drop + click-to-browse upload with client-side accept/size
+     * validation — not just a styled `<input type="file">`. The native input
+     * stays in the DOM (visually hidden, but a real element) so the platform
+     * file dialog and native drag events both work; this component adds the
+     * dropzone, validation, and the selected-files list around it.
+     * Client-side validation is a UX convenience, not a security boundary —
+     * always re-validate file type/size server-side.
+     */
+    interface HhFileUpload {
+        /**
+          * @default ''
+         */
+        "accept": string;
+        /**
+          * @default 'browse'
+         */
+        "browseText": string;
+        /**
+          * @default false
+         */
+        "disabled": boolean;
+        /**
+          * @default 'Drag files here or '
+         */
+        "dropzoneText": string;
+        /**
+          * @default ''
+         */
+        "error": string;
+        /**
+          * @default ''
+         */
+        "hint": string;
+        /**
+          * @default ''
+         */
+        "label": string;
+        "maxSizeBytes"?: number;
+        /**
+          * @default false
+         */
+        "multiple": boolean;
+        /**
+          * @default ''
+         */
+        "name": string;
+        /**
+          * @default false
+         */
+        "required": boolean;
     }
     interface HhFormField {
         /**
@@ -256,6 +519,47 @@ export namespace Components {
          */
         "value": string;
     }
+    /**
+     * A trigger + popover menu. The first slotted element (typically an
+     * `<hh-button>` or `<hh-icon-button>` with `slot="trigger"`) opens the menu;
+     * slotted `<hh-menu-item>` children make up the menu content.
+     *   <hh-menu label="Row actions">
+     *     <hh-button slot="trigger">Actions</hh-button>
+     *     <hh-menu-item value="edit">Edit</hh-menu-item>
+     *     <hh-menu-item value="duplicate">Duplicate</hh-menu-item>
+     *     <hh-menu-item value="delete" tone="danger">Delete</hh-menu-item>
+     *   </hh-menu>
+     */
+    interface HhMenu {
+        "close": () => Promise<void>;
+        /**
+          * @default ''
+         */
+        "label": string;
+        /**
+          * @default false
+         */
+        "open": boolean;
+        /**
+          * @default 'bottom-start'
+         */
+        "placement": 'bottom-start' | 'bottom-end';
+        "show": () => Promise<void>;
+    }
+    interface HhMenuItem {
+        /**
+          * @default false
+         */
+        "disabled": boolean;
+        /**
+          * @default 'default'
+         */
+        "tone": 'default' | 'danger';
+        /**
+          * @default ''
+         */
+        "value": string;
+    }
     interface HhMetricCard {
         /**
           * @default ''
@@ -294,6 +598,45 @@ export namespace Components {
          */
         "href": string;
     }
+    interface HhPagination {
+        /**
+          * @default 'Pagination'
+         */
+        "label": string;
+        /**
+          * @default 1
+         */
+        "page": number;
+        /**
+          * @default 1
+         */
+        "pageCount": number;
+        /**
+          * @default 1
+         */
+        "siblingCount": number;
+    }
+    /**
+     * Linear progress bar. Pairs with `<hh-spinner>` (circular, indeterminate-only).
+     */
+    interface HhProgress {
+        /**
+          * @default false
+         */
+        "indeterminate": boolean;
+        /**
+          * @default ''
+         */
+        "label": string;
+        /**
+          * @default 'action'
+         */
+        "tone": 'action' | 'success' | 'danger' | 'warning';
+        /**
+          * @default 0
+         */
+        "value": number;
+    }
     interface HhRadio {
         /**
           * @default false
@@ -315,6 +658,38 @@ export namespace Components {
           * @default false
          */
         "required": boolean;
+        /**
+          * @default ''
+         */
+        "value": string;
+    }
+    /**
+     * <hh-segmented-control value="week" label="Range">
+     *   <hh-segmented-item value="day">Day</hh-segmented-item>
+     *   <hh-segmented-item value="week">Week</hh-segmented-item>
+     *   <hh-segmented-item value="month">Month</hh-segmented-item>
+     * </hh-segmented-control>
+     */
+    interface HhSegmentedControl {
+        /**
+          * @default ''
+         */
+        "label": string;
+        /**
+          * @default ''
+         */
+        "value": string;
+    }
+    interface HhSegmentedItem {
+        /**
+          * @default false
+         */
+        "disabled": boolean;
+        /**
+          * Set by the parent <hh-segmented-control>.
+          * @default false
+         */
+        "selected": boolean;
         /**
           * @default ''
          */
@@ -350,6 +725,44 @@ export namespace Components {
           * @default ''
          */
         "value": string;
+    }
+    interface HhSkeleton {
+        "height"?: string;
+        /**
+          * @default 'text'
+         */
+        "variant": 'text' | 'circle' | 'rect';
+        "width"?: string;
+    }
+    interface HhSlider {
+        /**
+          * @default false
+         */
+        "disabled": boolean;
+        /**
+          * @default ''
+         */
+        "label": string;
+        /**
+          * @default 100
+         */
+        "max": number;
+        /**
+          * @default 0
+         */
+        "min": number;
+        /**
+          * @default false
+         */
+        "showValue": boolean;
+        /**
+          * @default 1
+         */
+        "step": number;
+        /**
+          * @default 0
+         */
+        "value": number;
     }
     interface HhSpinner {
         /**
@@ -448,6 +861,74 @@ export namespace Components {
          */
         "value": string;
     }
+    /**
+     * Wraps the native `<input type="time">` rather than a hand-rolled
+     * scroll-wheel widget: native time inputs already give consistent keyboard
+     * support (arrow keys increment hour/minute/AM-PM segments) and a
+     * platform-appropriate picker UI (spinner on desktop, wheel on mobile/iOS,
+     * clock UI on Android) with better baseline accessibility than a custom
+     * widget could realistically reach in this pass. `hh-date-picker` gets a
+     * custom calendar because native `<input type="date">`'s UX/a11y is
+     * inconsistent across browsers in ways that matter for a design system;
+     * `<input type="time">` doesn't have the same problem, so this component
+     * is a thin, consistently-styled wrapper instead of a reimplementation.
+     */
+    interface HhTimePicker {
+        /**
+          * @default false
+         */
+        "disabled": boolean;
+        /**
+          * @default ''
+         */
+        "error": string;
+        "focusControl": () => Promise<void>;
+        /**
+          * @default ''
+         */
+        "hint": string;
+        /**
+          * @default ''
+         */
+        "label": string;
+        "max"?: string;
+        "min"?: string;
+        /**
+          * @default ''
+         */
+        "name": string;
+        /**
+          * @default false
+         */
+        "required": boolean;
+        "step"?: number;
+        /**
+          * @default ''
+         */
+        "value": string;
+    }
+    /**
+     * A single region that owns a real dismiss queue (not just a visual list) —
+     * new toasts queue behind `maxVisible` active ones and promote automatically
+     * as older toasts are dismissed or time out. Mount one `<hh-toast-region>`
+     * per app (or per surface that needs its own notification area) and call
+     * `.show()` on it via a ref, e.g.:
+     *   const region = document.querySelector('hh-toast-region');
+     *   await region.show({ tone: 'success', message: 'Saved.' });
+     */
+    interface HhToastRegion {
+        "clear": () => Promise<void>;
+        "dismiss": (id: string, opts?: { silent?: boolean; }) => Promise<void>;
+        /**
+          * @default 3
+         */
+        "maxVisible": number;
+        /**
+          * @default 'bottom'
+         */
+        "placement": 'top' | 'bottom';
+        "show": (options: HhToastOptions) => Promise<string>;
+    }
     interface HhToolbar {
     }
     interface HhTooltip {
@@ -485,6 +966,22 @@ export interface HhCheckboxCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLHhCheckboxElement;
 }
+export interface HhComboboxCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLHhComboboxElement;
+}
+export interface HhComboboxOptionCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLHhComboboxOptionElement;
+}
+export interface HhDataTableCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLHhDataTableElement;
+}
+export interface HhDatePickerCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLHhDatePickerElement;
+}
 export interface HhDialogCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLHhDialogElement;
@@ -492,6 +989,10 @@ export interface HhDialogCustomEvent<T> extends CustomEvent<T> {
 export interface HhDrawerCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLHhDrawerElement;
+}
+export interface HhFileUploadCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLHhFileUploadElement;
 }
 export interface HhIconButtonCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -501,17 +1002,41 @@ export interface HhInputCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLHhInputElement;
 }
+export interface HhMenuCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLHhMenuElement;
+}
+export interface HhMenuItemCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLHhMenuItemElement;
+}
 export interface HhNavItemCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLHhNavItemElement;
+}
+export interface HhPaginationCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLHhPaginationElement;
 }
 export interface HhRadioCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLHhRadioElement;
 }
+export interface HhSegmentedControlCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLHhSegmentedControlElement;
+}
+export interface HhSegmentedItemCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLHhSegmentedItemElement;
+}
 export interface HhSelectCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLHhSelectElement;
+}
+export interface HhSliderCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLHhSliderElement;
 }
 export interface HhSwitchCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -528,6 +1053,10 @@ export interface HhTabsCustomEvent<T> extends CustomEvent<T> {
 export interface HhTextareaCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLHhTextareaElement;
+}
+export interface HhTimePickerCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLHhTimePickerElement;
 }
 declare global {
     interface HTMLHhAccordionElementEventMap {
@@ -581,11 +1110,43 @@ declare global {
         prototype: HTMLHhAlertElement;
         new (): HTMLHhAlertElement;
     };
+    interface HTMLHhAvatarElement extends Components.HhAvatar, HTMLStencilElement {
+    }
+    var HTMLHhAvatarElement: {
+        prototype: HTMLHhAvatarElement;
+        new (): HTMLHhAvatarElement;
+    };
     interface HTMLHhBadgeElement extends Components.HhBadge, HTMLStencilElement {
     }
     var HTMLHhBadgeElement: {
         prototype: HTMLHhBadgeElement;
         new (): HTMLHhBadgeElement;
+    };
+    interface HTMLHhBreadcrumbItemElement extends Components.HhBreadcrumbItem, HTMLStencilElement {
+    }
+    var HTMLHhBreadcrumbItemElement: {
+        prototype: HTMLHhBreadcrumbItemElement;
+        new (): HTMLHhBreadcrumbItemElement;
+    };
+    /**
+     * Wraps slotted `<hh-breadcrumb-item>` children, marking the last item as
+     * the current page and (optionally) collapsing the middle items behind a
+     * clickable ellipsis when there are more than `maxItems`.
+     *   <hh-breadcrumbs max-items="3">
+     *     <hh-breadcrumb-item href="/">Home</hh-breadcrumb-item>
+     *     <hh-breadcrumb-item href="/settings">Settings</hh-breadcrumb-item>
+     *     <hh-breadcrumb-item href="/settings/team">Team</hh-breadcrumb-item>
+     *     <hh-breadcrumb-item>Profile</hh-breadcrumb-item>
+     *   </hh-breadcrumbs>
+     * `shadow: false` means slotted items are real light-DOM children of the
+     * host, so collapsing is done by inserting/removing a real ellipsis <li>
+     * node next to them rather than trying to reorder projected slot content.
+     */
+    interface HTMLHhBreadcrumbsElement extends Components.HhBreadcrumbs, HTMLStencilElement {
+    }
+    var HTMLHhBreadcrumbsElement: {
+        prototype: HTMLHhBreadcrumbsElement;
+        new (): HTMLHhBreadcrumbsElement;
     };
     interface HTMLHhButtonElementEventMap {
         "hhPress": MouseEvent;
@@ -638,11 +1199,115 @@ declare global {
         prototype: HTMLHhCheckboxElement;
         new (): HTMLHhCheckboxElement;
     };
+    interface HTMLHhComboboxElementEventMap {
+        "hhChange": string;
+        "hhInput": string;
+    }
+    /**
+     * Type-ahead combobox following the WAI-ARIA 1.2 combobox pattern (input
+     * with `role="combobox"` + a `role="listbox"` popup, `aria-activedescendant`
+     * driving keyboard selection rather than moving real DOM focus).
+     *   <hh-combobox label="Country" name="country" value="us">
+     *     <hh-combobox-option value="us">United States</hh-combobox-option>
+     *     <hh-combobox-option value="ca">Canada</hh-combobox-option>
+     *     <hh-combobox-option value="mx">Mexico</hh-combobox-option>
+     *   </hh-combobox>
+     * Filtering is real (substring match against each option's text, live as
+     * you type) — it operates on the actual slotted `<hh-combobox-option>`
+     * elements (toggling `matched`/`active`/`selected` attributes on them, the
+     * same light-DOM-child pattern used by `hh-breadcrumbs`/`hh-segmented-control`)
+     * rather than re-rendering a parallel copy of the options.
+     * Set `allow-custom-value` to let the input's raw text become the value when
+     * it doesn't match any option (e.g. a tags field); otherwise the input
+     * reverts to the last matched option's label on blur/Escape.
+     */
+    interface HTMLHhComboboxElement extends Components.HhCombobox, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLHhComboboxElementEventMap>(type: K, listener: (this: HTMLHhComboboxElement, ev: HhComboboxCustomEvent<HTMLHhComboboxElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLHhComboboxElementEventMap>(type: K, listener: (this: HTMLHhComboboxElement, ev: HhComboboxCustomEvent<HTMLHhComboboxElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLHhComboboxElement: {
+        prototype: HTMLHhComboboxElement;
+        new (): HTMLHhComboboxElement;
+    };
+    interface HTMLHhComboboxOptionElementEventMap {
+        "hhSelect": string;
+    }
+    interface HTMLHhComboboxOptionElement extends Components.HhComboboxOption, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLHhComboboxOptionElementEventMap>(type: K, listener: (this: HTMLHhComboboxOptionElement, ev: HhComboboxOptionCustomEvent<HTMLHhComboboxOptionElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLHhComboboxOptionElementEventMap>(type: K, listener: (this: HTMLHhComboboxOptionElement, ev: HhComboboxOptionCustomEvent<HTMLHhComboboxOptionElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLHhComboboxOptionElement: {
+        prototype: HTMLHhComboboxOptionElement;
+        new (): HTMLHhComboboxOptionElement;
+    };
+    interface HTMLHhDataTableElementEventMap {
+        "hhSortChange": { key: string; direction: SortDirection };
+        "hhFilterChange": string;
+        "hhPageChange": number;
+    }
+    /**
+     * A real interactive table: click a sortable column header to sort by it
+     * (asc → desc → none), type in the filter box to filter across all column
+     * values, and page through results — not just a static markup demo.
+     * Sorting/filtering/pagination all run client-side over `rows`; for
+     * server-side paging, listen for `hhPageChange`/`hhSortChange`/`hhFilterChange`
+     * and re-fetch instead of relying on the internal state.
+     */
     interface HTMLHhDataTableElement extends Components.HhDataTable, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLHhDataTableElementEventMap>(type: K, listener: (this: HTMLHhDataTableElement, ev: HhDataTableCustomEvent<HTMLHhDataTableElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLHhDataTableElementEventMap>(type: K, listener: (this: HTMLHhDataTableElement, ev: HhDataTableCustomEvent<HTMLHhDataTableElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLHhDataTableElement: {
         prototype: HTMLHhDataTableElement;
         new (): HTMLHhDataTableElement;
+    };
+    interface HTMLHhDatePickerElementEventMap {
+        "hhChange": string;
+        "hhInput": string;
+    }
+    /**
+     * Calendar-grid date picker (WAI-ARIA date picker dialog pattern: a text
+     * input + a `role="dialog"` popup containing a `role="grid"` of real day
+     * `<button>`s with roving tabindex — arrow keys move actual DOM focus
+     * between days, not just `aria-activedescendant`).
+     * The stored/emitted `value` is always ISO `yyyy-mm-dd`, matching native
+     * `<input type="date">` semantics, regardless of the `locale` used to
+     * render weekday/month labels in the calendar UI itself — so a Spanish or
+     * French `locale` prop changes what the calendar *looks like* without
+     * changing what other code needs to parse.
+     *   <hh-date-picker label="Fecha de viaje" locale="es-BO" first-day-of-week="1" />
+     */
+    interface HTMLHhDatePickerElement extends Components.HhDatePicker, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLHhDatePickerElementEventMap>(type: K, listener: (this: HTMLHhDatePickerElement, ev: HhDatePickerCustomEvent<HTMLHhDatePickerElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLHhDatePickerElementEventMap>(type: K, listener: (this: HTMLHhDatePickerElement, ev: HhDatePickerCustomEvent<HTMLHhDatePickerElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLHhDatePickerElement: {
+        prototype: HTMLHhDatePickerElement;
+        new (): HTMLHhDatePickerElement;
     };
     interface HTMLHhDialogElementEventMap {
         "hhOpen": void;
@@ -685,6 +1350,33 @@ declare global {
     var HTMLHhEmptyStateElement: {
         prototype: HTMLHhEmptyStateElement;
         new (): HTMLHhEmptyStateElement;
+    };
+    interface HTMLHhFileUploadElementEventMap {
+        "hhFilesChange": File[];
+        "hhFileError": HhFileUploadError[];
+    }
+    /**
+     * Real drag-and-drop + click-to-browse upload with client-side accept/size
+     * validation — not just a styled `<input type="file">`. The native input
+     * stays in the DOM (visually hidden, but a real element) so the platform
+     * file dialog and native drag events both work; this component adds the
+     * dropzone, validation, and the selected-files list around it.
+     * Client-side validation is a UX convenience, not a security boundary —
+     * always re-validate file type/size server-side.
+     */
+    interface HTMLHhFileUploadElement extends Components.HhFileUpload, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLHhFileUploadElementEventMap>(type: K, listener: (this: HTMLHhFileUploadElement, ev: HhFileUploadCustomEvent<HTMLHhFileUploadElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLHhFileUploadElementEventMap>(type: K, listener: (this: HTMLHhFileUploadElement, ev: HhFileUploadCustomEvent<HTMLHhFileUploadElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLHhFileUploadElement: {
+        prototype: HTMLHhFileUploadElement;
+        new (): HTMLHhFileUploadElement;
     };
     interface HTMLHhFormFieldElement extends Components.HhFormField, HTMLStencilElement {
     }
@@ -733,6 +1425,52 @@ declare global {
         prototype: HTMLHhInputElement;
         new (): HTMLHhInputElement;
     };
+    interface HTMLHhMenuElementEventMap {
+        "hhOpenChange": boolean;
+        "hhSelect": string;
+    }
+    /**
+     * A trigger + popover menu. The first slotted element (typically an
+     * `<hh-button>` or `<hh-icon-button>` with `slot="trigger"`) opens the menu;
+     * slotted `<hh-menu-item>` children make up the menu content.
+     *   <hh-menu label="Row actions">
+     *     <hh-button slot="trigger">Actions</hh-button>
+     *     <hh-menu-item value="edit">Edit</hh-menu-item>
+     *     <hh-menu-item value="duplicate">Duplicate</hh-menu-item>
+     *     <hh-menu-item value="delete" tone="danger">Delete</hh-menu-item>
+     *   </hh-menu>
+     */
+    interface HTMLHhMenuElement extends Components.HhMenu, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLHhMenuElementEventMap>(type: K, listener: (this: HTMLHhMenuElement, ev: HhMenuCustomEvent<HTMLHhMenuElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLHhMenuElementEventMap>(type: K, listener: (this: HTMLHhMenuElement, ev: HhMenuCustomEvent<HTMLHhMenuElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLHhMenuElement: {
+        prototype: HTMLHhMenuElement;
+        new (): HTMLHhMenuElement;
+    };
+    interface HTMLHhMenuItemElementEventMap {
+        "hhSelect": string;
+    }
+    interface HTMLHhMenuItemElement extends Components.HhMenuItem, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLHhMenuItemElementEventMap>(type: K, listener: (this: HTMLHhMenuItemElement, ev: HhMenuItemCustomEvent<HTMLHhMenuItemElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLHhMenuItemElementEventMap>(type: K, listener: (this: HTMLHhMenuItemElement, ev: HhMenuItemCustomEvent<HTMLHhMenuItemElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLHhMenuItemElement: {
+        prototype: HTMLHhMenuItemElement;
+        new (): HTMLHhMenuItemElement;
+    };
     interface HTMLHhMetricCardElement extends Components.HhMetricCard, HTMLStencilElement {
     }
     var HTMLHhMetricCardElement: {
@@ -762,6 +1500,32 @@ declare global {
         prototype: HTMLHhNavItemElement;
         new (): HTMLHhNavItemElement;
     };
+    interface HTMLHhPaginationElementEventMap {
+        "hhChange": number;
+    }
+    interface HTMLHhPaginationElement extends Components.HhPagination, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLHhPaginationElementEventMap>(type: K, listener: (this: HTMLHhPaginationElement, ev: HhPaginationCustomEvent<HTMLHhPaginationElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLHhPaginationElementEventMap>(type: K, listener: (this: HTMLHhPaginationElement, ev: HhPaginationCustomEvent<HTMLHhPaginationElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLHhPaginationElement: {
+        prototype: HTMLHhPaginationElement;
+        new (): HTMLHhPaginationElement;
+    };
+    /**
+     * Linear progress bar. Pairs with `<hh-spinner>` (circular, indeterminate-only).
+     */
+    interface HTMLHhProgressElement extends Components.HhProgress, HTMLStencilElement {
+    }
+    var HTMLHhProgressElement: {
+        prototype: HTMLHhProgressElement;
+        new (): HTMLHhProgressElement;
+    };
     interface HTMLHhRadioElementEventMap {
         "hhChange": string;
     }
@@ -779,6 +1543,47 @@ declare global {
         prototype: HTMLHhRadioElement;
         new (): HTMLHhRadioElement;
     };
+    interface HTMLHhSegmentedControlElementEventMap {
+        "hhChange": string;
+    }
+    /**
+     * <hh-segmented-control value="week" label="Range">
+     *   <hh-segmented-item value="day">Day</hh-segmented-item>
+     *   <hh-segmented-item value="week">Week</hh-segmented-item>
+     *   <hh-segmented-item value="month">Month</hh-segmented-item>
+     * </hh-segmented-control>
+     */
+    interface HTMLHhSegmentedControlElement extends Components.HhSegmentedControl, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLHhSegmentedControlElementEventMap>(type: K, listener: (this: HTMLHhSegmentedControlElement, ev: HhSegmentedControlCustomEvent<HTMLHhSegmentedControlElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLHhSegmentedControlElementEventMap>(type: K, listener: (this: HTMLHhSegmentedControlElement, ev: HhSegmentedControlCustomEvent<HTMLHhSegmentedControlElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLHhSegmentedControlElement: {
+        prototype: HTMLHhSegmentedControlElement;
+        new (): HTMLHhSegmentedControlElement;
+    };
+    interface HTMLHhSegmentedItemElementEventMap {
+        "hhSelect": string;
+    }
+    interface HTMLHhSegmentedItemElement extends Components.HhSegmentedItem, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLHhSegmentedItemElementEventMap>(type: K, listener: (this: HTMLHhSegmentedItemElement, ev: HhSegmentedItemCustomEvent<HTMLHhSegmentedItemElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLHhSegmentedItemElementEventMap>(type: K, listener: (this: HTMLHhSegmentedItemElement, ev: HhSegmentedItemCustomEvent<HTMLHhSegmentedItemElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLHhSegmentedItemElement: {
+        prototype: HTMLHhSegmentedItemElement;
+        new (): HTMLHhSegmentedItemElement;
+    };
     interface HTMLHhSelectElementEventMap {
         "hhChange": string;
     }
@@ -795,6 +1600,30 @@ declare global {
     var HTMLHhSelectElement: {
         prototype: HTMLHhSelectElement;
         new (): HTMLHhSelectElement;
+    };
+    interface HTMLHhSkeletonElement extends Components.HhSkeleton, HTMLStencilElement {
+    }
+    var HTMLHhSkeletonElement: {
+        prototype: HTMLHhSkeletonElement;
+        new (): HTMLHhSkeletonElement;
+    };
+    interface HTMLHhSliderElementEventMap {
+        "hhInput": number;
+        "hhChange": number;
+    }
+    interface HTMLHhSliderElement extends Components.HhSlider, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLHhSliderElementEventMap>(type: K, listener: (this: HTMLHhSliderElement, ev: HhSliderCustomEvent<HTMLHhSliderElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLHhSliderElementEventMap>(type: K, listener: (this: HTMLHhSliderElement, ev: HhSliderCustomEvent<HTMLHhSliderElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLHhSliderElement: {
+        prototype: HTMLHhSliderElement;
+        new (): HTMLHhSliderElement;
     };
     interface HTMLHhSpinnerElement extends Components.HhSpinner, HTMLStencilElement {
     }
@@ -883,6 +1712,51 @@ declare global {
         prototype: HTMLHhTextareaElement;
         new (): HTMLHhTextareaElement;
     };
+    interface HTMLHhTimePickerElementEventMap {
+        "hhChange": string;
+        "hhInput": string;
+    }
+    /**
+     * Wraps the native `<input type="time">` rather than a hand-rolled
+     * scroll-wheel widget: native time inputs already give consistent keyboard
+     * support (arrow keys increment hour/minute/AM-PM segments) and a
+     * platform-appropriate picker UI (spinner on desktop, wheel on mobile/iOS,
+     * clock UI on Android) with better baseline accessibility than a custom
+     * widget could realistically reach in this pass. `hh-date-picker` gets a
+     * custom calendar because native `<input type="date">`'s UX/a11y is
+     * inconsistent across browsers in ways that matter for a design system;
+     * `<input type="time">` doesn't have the same problem, so this component
+     * is a thin, consistently-styled wrapper instead of a reimplementation.
+     */
+    interface HTMLHhTimePickerElement extends Components.HhTimePicker, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLHhTimePickerElementEventMap>(type: K, listener: (this: HTMLHhTimePickerElement, ev: HhTimePickerCustomEvent<HTMLHhTimePickerElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLHhTimePickerElementEventMap>(type: K, listener: (this: HTMLHhTimePickerElement, ev: HhTimePickerCustomEvent<HTMLHhTimePickerElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLHhTimePickerElement: {
+        prototype: HTMLHhTimePickerElement;
+        new (): HTMLHhTimePickerElement;
+    };
+    /**
+     * A single region that owns a real dismiss queue (not just a visual list) —
+     * new toasts queue behind `maxVisible` active ones and promote automatically
+     * as older toasts are dismissed or time out. Mount one `<hh-toast-region>`
+     * per app (or per surface that needs its own notification area) and call
+     * `.show()` on it via a ref, e.g.:
+     *   const region = document.querySelector('hh-toast-region');
+     *   await region.show({ tone: 'success', message: 'Saved.' });
+     */
+    interface HTMLHhToastRegionElement extends Components.HhToastRegion, HTMLStencilElement {
+    }
+    var HTMLHhToastRegionElement: {
+        prototype: HTMLHhToastRegionElement;
+        new (): HTMLHhToastRegionElement;
+    };
     interface HTMLHhToolbarElement extends Components.HhToolbar, HTMLStencilElement {
     }
     var HTMLHhToolbarElement: {
@@ -899,23 +1773,38 @@ declare global {
         "hh-accordion": HTMLHhAccordionElement;
         "hh-accordion-item": HTMLHhAccordionItemElement;
         "hh-alert": HTMLHhAlertElement;
+        "hh-avatar": HTMLHhAvatarElement;
         "hh-badge": HTMLHhBadgeElement;
+        "hh-breadcrumb-item": HTMLHhBreadcrumbItemElement;
+        "hh-breadcrumbs": HTMLHhBreadcrumbsElement;
         "hh-button": HTMLHhButtonElement;
         "hh-card": HTMLHhCardElement;
         "hh-checkbox": HTMLHhCheckboxElement;
+        "hh-combobox": HTMLHhComboboxElement;
+        "hh-combobox-option": HTMLHhComboboxOptionElement;
         "hh-data-table": HTMLHhDataTableElement;
+        "hh-date-picker": HTMLHhDatePickerElement;
         "hh-dialog": HTMLHhDialogElement;
         "hh-drawer": HTMLHhDrawerElement;
         "hh-empty-state": HTMLHhEmptyStateElement;
+        "hh-file-upload": HTMLHhFileUploadElement;
         "hh-form-field": HTMLHhFormFieldElement;
         "hh-icon": HTMLHhIconElement;
         "hh-icon-button": HTMLHhIconButtonElement;
         "hh-input": HTMLHhInputElement;
+        "hh-menu": HTMLHhMenuElement;
+        "hh-menu-item": HTMLHhMenuItemElement;
         "hh-metric-card": HTMLHhMetricCardElement;
         "hh-nav": HTMLHhNavElement;
         "hh-nav-item": HTMLHhNavItemElement;
+        "hh-pagination": HTMLHhPaginationElement;
+        "hh-progress": HTMLHhProgressElement;
         "hh-radio": HTMLHhRadioElement;
+        "hh-segmented-control": HTMLHhSegmentedControlElement;
+        "hh-segmented-item": HTMLHhSegmentedItemElement;
         "hh-select": HTMLHhSelectElement;
+        "hh-skeleton": HTMLHhSkeletonElement;
+        "hh-slider": HTMLHhSliderElement;
         "hh-spinner": HTMLHhSpinnerElement;
         "hh-status": HTMLHhStatusElement;
         "hh-switch": HTMLHhSwitchElement;
@@ -923,6 +1812,8 @@ declare global {
         "hh-tab-panel": HTMLHhTabPanelElement;
         "hh-tabs": HTMLHhTabsElement;
         "hh-textarea": HTMLHhTextareaElement;
+        "hh-time-picker": HTMLHhTimePickerElement;
+        "hh-toast-region": HTMLHhToastRegionElement;
         "hh-toolbar": HTMLHhToolbarElement;
         "hh-tooltip": HTMLHhTooltipElement;
     }
@@ -967,11 +1858,65 @@ declare namespace LocalJSX {
          */
         "tone"?: 'info' | 'success' | 'warning' | 'danger';
     }
+    interface HhAvatar {
+        /**
+          * @default ''
+         */
+        "name"?: string;
+        /**
+          * @default 'circle'
+         */
+        "shape"?: 'circle' | 'square';
+        /**
+          * @default 'medium'
+         */
+        "size"?: 'small' | 'medium' | 'large';
+        "src"?: string;
+        /**
+          * Optional presence dot.
+         */
+        "status"?: 'online' | 'offline' | 'busy' | 'away';
+    }
     interface HhBadge {
         /**
           * @default 'neutral'
          */
         "tone"?: 'neutral' | 'info' | 'success' | 'warning' | 'danger';
+    }
+    interface HhBreadcrumbItem {
+        /**
+          * Set automatically by the parent <hh-breadcrumbs> on the last item.
+          * @default false
+         */
+        "current"?: boolean;
+        /**
+          * @default ''
+         */
+        "href"?: string;
+    }
+    /**
+     * Wraps slotted `<hh-breadcrumb-item>` children, marking the last item as
+     * the current page and (optionally) collapsing the middle items behind a
+     * clickable ellipsis when there are more than `maxItems`.
+     *   <hh-breadcrumbs max-items="3">
+     *     <hh-breadcrumb-item href="/">Home</hh-breadcrumb-item>
+     *     <hh-breadcrumb-item href="/settings">Settings</hh-breadcrumb-item>
+     *     <hh-breadcrumb-item href="/settings/team">Team</hh-breadcrumb-item>
+     *     <hh-breadcrumb-item>Profile</hh-breadcrumb-item>
+     *   </hh-breadcrumbs>
+     * `shadow: false` means slotted items are real light-DOM children of the
+     * host, so collapsing is done by inserting/removing a real ellipsis <li>
+     * node next to them rather than trying to reorder projected slot content.
+     */
+    interface HhBreadcrumbs {
+        /**
+          * @default 'Breadcrumb'
+         */
+        "label"?: string;
+        /**
+          * @default 0
+         */
+        "maxItems"?: number;
     }
     interface HhButton {
         /**
@@ -1034,6 +1979,96 @@ declare namespace LocalJSX {
          */
         "value"?: string;
     }
+    /**
+     * Type-ahead combobox following the WAI-ARIA 1.2 combobox pattern (input
+     * with `role="combobox"` + a `role="listbox"` popup, `aria-activedescendant`
+     * driving keyboard selection rather than moving real DOM focus).
+     *   <hh-combobox label="Country" name="country" value="us">
+     *     <hh-combobox-option value="us">United States</hh-combobox-option>
+     *     <hh-combobox-option value="ca">Canada</hh-combobox-option>
+     *     <hh-combobox-option value="mx">Mexico</hh-combobox-option>
+     *   </hh-combobox>
+     * Filtering is real (substring match against each option's text, live as
+     * you type) — it operates on the actual slotted `<hh-combobox-option>`
+     * elements (toggling `matched`/`active`/`selected` attributes on them, the
+     * same light-DOM-child pattern used by `hh-breadcrumbs`/`hh-segmented-control`)
+     * rather than re-rendering a parallel copy of the options.
+     * Set `allow-custom-value` to let the input's raw text become the value when
+     * it doesn't match any option (e.g. a tags field); otherwise the input
+     * reverts to the last matched option's label on blur/Escape.
+     */
+    interface HhCombobox {
+        /**
+          * @default false
+         */
+        "allowCustomValue"?: boolean;
+        /**
+          * @default false
+         */
+        "disabled"?: boolean;
+        /**
+          * @default ''
+         */
+        "error"?: string;
+        /**
+          * @default ''
+         */
+        "hint"?: string;
+        /**
+          * @default ''
+         */
+        "label"?: string;
+        /**
+          * @default ''
+         */
+        "name"?: string;
+        /**
+          * @default 'No results'
+         */
+        "noResultsText"?: string;
+        "onHhChange"?: (event: HhComboboxCustomEvent<string>) => void;
+        "onHhInput"?: (event: HhComboboxCustomEvent<string>) => void;
+        /**
+          * @default ''
+         */
+        "placeholder"?: string;
+        /**
+          * @default false
+         */
+        "required"?: boolean;
+        /**
+          * @default ''
+         */
+        "value"?: string;
+    }
+    interface HhComboboxOption {
+        /**
+          * @default false
+         */
+        "active"?: boolean;
+        /**
+          * All three are set by the parent <hh-combobox> — presence-based (toggleAttribute), not string values.
+          * @default true
+         */
+        "matched"?: boolean;
+        "onHhSelect"?: (event: HhComboboxOptionCustomEvent<string>) => void;
+        /**
+          * @default false
+         */
+        "selected"?: boolean;
+        /**
+          * @default ''
+         */
+        "value"?: string;
+    }
+    /**
+     * A real interactive table: click a sortable column header to sort by it
+     * (asc → desc → none), type in the filter box to filter across all column
+     * values, and page through results — not just a static markup demo.
+     * Sorting/filtering/pagination all run client-side over `rows`; for
+     * server-side paging, listen for `hhPageChange`/`hhSortChange`/`hhFilterChange`
+     * and re-fetch instead of relying on the internal state.
+     */
     interface HhDataTable {
         /**
           * @default ''
@@ -1044,9 +2079,79 @@ declare namespace LocalJSX {
          */
         "columns"?: HhTableColumn[];
         /**
+          * @default 'Filter…'
+         */
+        "filterPlaceholder"?: string;
+        /**
+          * @default false
+         */
+        "filterable"?: boolean;
+        "onHhFilterChange"?: (event: HhDataTableCustomEvent<string>) => void;
+        "onHhPageChange"?: (event: HhDataTableCustomEvent<number>) => void;
+        "onHhSortChange"?: (event: HhDataTableCustomEvent<{ key: string; direction: SortDirection }>) => void;
+        /**
+          * @default 0
+         */
+        "pageSize"?: number;
+        /**
           * @default []
          */
         "rows"?: Record<string, string>[];
+    }
+    /**
+     * Calendar-grid date picker (WAI-ARIA date picker dialog pattern: a text
+     * input + a `role="dialog"` popup containing a `role="grid"` of real day
+     * `<button>`s with roving tabindex — arrow keys move actual DOM focus
+     * between days, not just `aria-activedescendant`).
+     * The stored/emitted `value` is always ISO `yyyy-mm-dd`, matching native
+     * `<input type="date">` semantics, regardless of the `locale` used to
+     * render weekday/month labels in the calendar UI itself — so a Spanish or
+     * French `locale` prop changes what the calendar *looks like* without
+     * changing what other code needs to parse.
+     *   <hh-date-picker label="Fecha de viaje" locale="es-BO" first-day-of-week="1" />
+     */
+    interface HhDatePicker {
+        /**
+          * @default false
+         */
+        "disabled"?: boolean;
+        /**
+          * @default ''
+         */
+        "error"?: string;
+        /**
+          * @default 0
+         */
+        "firstDayOfWeek"?: 0 | 1;
+        /**
+          * @default ''
+         */
+        "hint"?: string;
+        /**
+          * @default ''
+         */
+        "label"?: string;
+        "locale"?: string;
+        "max"?: string;
+        "min"?: string;
+        /**
+          * @default ''
+         */
+        "name"?: string;
+        "onHhChange"?: (event: HhDatePickerCustomEvent<string>) => void;
+        "onHhInput"?: (event: HhDatePickerCustomEvent<string>) => void;
+        /**
+          * @default 'YYYY-MM-DD'
+         */
+        "placeholder"?: string;
+        /**
+          * @default false
+         */
+        "required"?: boolean;
+        /**
+          * @default ''
+         */
+        "value"?: string;
     }
     interface HhDialog {
         /**
@@ -1080,9 +2185,10 @@ declare namespace LocalJSX {
          */
         "open"?: boolean;
         /**
-          * @default 'right'
+          * 'start'/'end' are logical and flip with document direction (recommended for RTL support). 'left'/'right' are kept for backwards compatibility and always render on that literal physical side regardless of `dir`.
+          * @default 'end'
          */
-        "side"?: 'left' | 'right';
+        "side"?: 'left' | 'right' | 'start' | 'end';
     }
     interface HhEmptyState {
         /**
@@ -1093,6 +2199,60 @@ declare namespace LocalJSX {
           * @default ''
          */
         "heading"?: string;
+    }
+    /**
+     * Real drag-and-drop + click-to-browse upload with client-side accept/size
+     * validation — not just a styled `<input type="file">`. The native input
+     * stays in the DOM (visually hidden, but a real element) so the platform
+     * file dialog and native drag events both work; this component adds the
+     * dropzone, validation, and the selected-files list around it.
+     * Client-side validation is a UX convenience, not a security boundary —
+     * always re-validate file type/size server-side.
+     */
+    interface HhFileUpload {
+        /**
+          * @default ''
+         */
+        "accept"?: string;
+        /**
+          * @default 'browse'
+         */
+        "browseText"?: string;
+        /**
+          * @default false
+         */
+        "disabled"?: boolean;
+        /**
+          * @default 'Drag files here or '
+         */
+        "dropzoneText"?: string;
+        /**
+          * @default ''
+         */
+        "error"?: string;
+        /**
+          * @default ''
+         */
+        "hint"?: string;
+        /**
+          * @default ''
+         */
+        "label"?: string;
+        "maxSizeBytes"?: number;
+        /**
+          * @default false
+         */
+        "multiple"?: boolean;
+        /**
+          * @default ''
+         */
+        "name"?: string;
+        "onHhFileError"?: (event: HhFileUploadCustomEvent<HhFileUploadError[]>) => void;
+        "onHhFilesChange"?: (event: HhFileUploadCustomEvent<File[]>) => void;
+        /**
+          * @default false
+         */
+        "required"?: boolean;
     }
     interface HhFormField {
         /**
@@ -1179,6 +2339,48 @@ declare namespace LocalJSX {
          */
         "value"?: string;
     }
+    /**
+     * A trigger + popover menu. The first slotted element (typically an
+     * `<hh-button>` or `<hh-icon-button>` with `slot="trigger"`) opens the menu;
+     * slotted `<hh-menu-item>` children make up the menu content.
+     *   <hh-menu label="Row actions">
+     *     <hh-button slot="trigger">Actions</hh-button>
+     *     <hh-menu-item value="edit">Edit</hh-menu-item>
+     *     <hh-menu-item value="duplicate">Duplicate</hh-menu-item>
+     *     <hh-menu-item value="delete" tone="danger">Delete</hh-menu-item>
+     *   </hh-menu>
+     */
+    interface HhMenu {
+        /**
+          * @default ''
+         */
+        "label"?: string;
+        "onHhOpenChange"?: (event: HhMenuCustomEvent<boolean>) => void;
+        "onHhSelect"?: (event: HhMenuCustomEvent<string>) => void;
+        /**
+          * @default false
+         */
+        "open"?: boolean;
+        /**
+          * @default 'bottom-start'
+         */
+        "placement"?: 'bottom-start' | 'bottom-end';
+    }
+    interface HhMenuItem {
+        /**
+          * @default false
+         */
+        "disabled"?: boolean;
+        "onHhSelect"?: (event: HhMenuItemCustomEvent<string>) => void;
+        /**
+          * @default 'default'
+         */
+        "tone"?: 'default' | 'danger';
+        /**
+          * @default ''
+         */
+        "value"?: string;
+    }
     interface HhMetricCard {
         /**
           * @default ''
@@ -1218,6 +2420,46 @@ declare namespace LocalJSX {
         "href"?: string;
         "onHhNavigate"?: (event: HhNavItemCustomEvent<string>) => void;
     }
+    interface HhPagination {
+        /**
+          * @default 'Pagination'
+         */
+        "label"?: string;
+        "onHhChange"?: (event: HhPaginationCustomEvent<number>) => void;
+        /**
+          * @default 1
+         */
+        "page"?: number;
+        /**
+          * @default 1
+         */
+        "pageCount"?: number;
+        /**
+          * @default 1
+         */
+        "siblingCount"?: number;
+    }
+    /**
+     * Linear progress bar. Pairs with `<hh-spinner>` (circular, indeterminate-only).
+     */
+    interface HhProgress {
+        /**
+          * @default false
+         */
+        "indeterminate"?: boolean;
+        /**
+          * @default ''
+         */
+        "label"?: string;
+        /**
+          * @default 'action'
+         */
+        "tone"?: 'action' | 'success' | 'danger' | 'warning';
+        /**
+          * @default 0
+         */
+        "value"?: number;
+    }
     interface HhRadio {
         /**
           * @default false
@@ -1240,6 +2482,40 @@ declare namespace LocalJSX {
           * @default false
          */
         "required"?: boolean;
+        /**
+          * @default ''
+         */
+        "value"?: string;
+    }
+    /**
+     * <hh-segmented-control value="week" label="Range">
+     *   <hh-segmented-item value="day">Day</hh-segmented-item>
+     *   <hh-segmented-item value="week">Week</hh-segmented-item>
+     *   <hh-segmented-item value="month">Month</hh-segmented-item>
+     * </hh-segmented-control>
+     */
+    interface HhSegmentedControl {
+        /**
+          * @default ''
+         */
+        "label"?: string;
+        "onHhChange"?: (event: HhSegmentedControlCustomEvent<string>) => void;
+        /**
+          * @default ''
+         */
+        "value"?: string;
+    }
+    interface HhSegmentedItem {
+        /**
+          * @default false
+         */
+        "disabled"?: boolean;
+        "onHhSelect"?: (event: HhSegmentedItemCustomEvent<string>) => void;
+        /**
+          * Set by the parent <hh-segmented-control>.
+          * @default false
+         */
+        "selected"?: boolean;
         /**
           * @default ''
          */
@@ -1275,6 +2551,46 @@ declare namespace LocalJSX {
           * @default ''
          */
         "value"?: string;
+    }
+    interface HhSkeleton {
+        "height"?: string;
+        /**
+          * @default 'text'
+         */
+        "variant"?: 'text' | 'circle' | 'rect';
+        "width"?: string;
+    }
+    interface HhSlider {
+        /**
+          * @default false
+         */
+        "disabled"?: boolean;
+        /**
+          * @default ''
+         */
+        "label"?: string;
+        /**
+          * @default 100
+         */
+        "max"?: number;
+        /**
+          * @default 0
+         */
+        "min"?: number;
+        "onHhChange"?: (event: HhSliderCustomEvent<number>) => void;
+        "onHhInput"?: (event: HhSliderCustomEvent<number>) => void;
+        /**
+          * @default false
+         */
+        "showValue"?: boolean;
+        /**
+          * @default 1
+         */
+        "step"?: number;
+        /**
+          * @default 0
+         */
+        "value"?: number;
     }
     interface HhSpinner {
         /**
@@ -1377,6 +2693,72 @@ declare namespace LocalJSX {
          */
         "value"?: string;
     }
+    /**
+     * Wraps the native `<input type="time">` rather than a hand-rolled
+     * scroll-wheel widget: native time inputs already give consistent keyboard
+     * support (arrow keys increment hour/minute/AM-PM segments) and a
+     * platform-appropriate picker UI (spinner on desktop, wheel on mobile/iOS,
+     * clock UI on Android) with better baseline accessibility than a custom
+     * widget could realistically reach in this pass. `hh-date-picker` gets a
+     * custom calendar because native `<input type="date">`'s UX/a11y is
+     * inconsistent across browsers in ways that matter for a design system;
+     * `<input type="time">` doesn't have the same problem, so this component
+     * is a thin, consistently-styled wrapper instead of a reimplementation.
+     */
+    interface HhTimePicker {
+        /**
+          * @default false
+         */
+        "disabled"?: boolean;
+        /**
+          * @default ''
+         */
+        "error"?: string;
+        /**
+          * @default ''
+         */
+        "hint"?: string;
+        /**
+          * @default ''
+         */
+        "label"?: string;
+        "max"?: string;
+        "min"?: string;
+        /**
+          * @default ''
+         */
+        "name"?: string;
+        "onHhChange"?: (event: HhTimePickerCustomEvent<string>) => void;
+        "onHhInput"?: (event: HhTimePickerCustomEvent<string>) => void;
+        /**
+          * @default false
+         */
+        "required"?: boolean;
+        "step"?: number;
+        /**
+          * @default ''
+         */
+        "value"?: string;
+    }
+    /**
+     * A single region that owns a real dismiss queue (not just a visual list) —
+     * new toasts queue behind `maxVisible` active ones and promote automatically
+     * as older toasts are dismissed or time out. Mount one `<hh-toast-region>`
+     * per app (or per surface that needs its own notification area) and call
+     * `.show()` on it via a ref, e.g.:
+     *   const region = document.querySelector('hh-toast-region');
+     *   await region.show({ tone: 'success', message: 'Saved.' });
+     */
+    interface HhToastRegion {
+        /**
+          * @default 3
+         */
+        "maxVisible"?: number;
+        /**
+          * @default 'bottom'
+         */
+        "placement"?: 'top' | 'bottom';
+    }
     interface HhToolbar {
     }
     interface HhTooltip {
@@ -1403,8 +2785,23 @@ declare namespace LocalJSX {
         "heading": string;
         "dismissible": boolean;
     }
+    interface HhAvatarAttributes {
+        "src": string;
+        "name": string;
+        "size": 'small' | 'medium' | 'large';
+        "shape": 'circle' | 'square';
+        "status": 'online' | 'offline' | 'busy' | 'away';
+    }
     interface HhBadgeAttributes {
         "tone": 'neutral' | 'info' | 'success' | 'warning' | 'danger';
+    }
+    interface HhBreadcrumbItemAttributes {
+        "href": string;
+        "current": boolean;
+    }
+    interface HhBreadcrumbsAttributes {
+        "label": string;
+        "maxItems": number;
     }
     interface HhButtonAttributes {
         "variant": HhButtonVariant;
@@ -1425,8 +2822,43 @@ declare namespace LocalJSX {
         "value": string;
         "required": boolean;
     }
+    interface HhComboboxAttributes {
+        "label": string;
+        "name": string;
+        "value": string;
+        "placeholder": string;
+        "hint": string;
+        "error": string;
+        "required": boolean;
+        "disabled": boolean;
+        "allowCustomValue": boolean;
+        "noResultsText": string;
+    }
+    interface HhComboboxOptionAttributes {
+        "value": string;
+        "matched": boolean;
+        "active": boolean;
+        "selected": boolean;
+    }
     interface HhDataTableAttributes {
         "caption": string;
+        "filterable": boolean;
+        "filterPlaceholder": string;
+        "pageSize": number;
+    }
+    interface HhDatePickerAttributes {
+        "label": string;
+        "name": string;
+        "value": string;
+        "min": string;
+        "max": string;
+        "locale": string;
+        "firstDayOfWeek": 0 | 1;
+        "hint": string;
+        "error": string;
+        "required": boolean;
+        "disabled": boolean;
+        "placeholder": string;
     }
     interface HhDialogAttributes {
         "open": boolean;
@@ -1436,12 +2868,25 @@ declare namespace LocalJSX {
     interface HhDrawerAttributes {
         "open": boolean;
         "label": string;
-        "side": 'left' | 'right';
+        "side": 'left' | 'right' | 'start' | 'end';
         "closeOnEscape": boolean;
     }
     interface HhEmptyStateAttributes {
         "heading": string;
         "description": string;
+    }
+    interface HhFileUploadAttributes {
+        "label": string;
+        "name": string;
+        "accept": string;
+        "multiple": boolean;
+        "disabled": boolean;
+        "required": boolean;
+        "hint": string;
+        "error": string;
+        "maxSizeBytes": number;
+        "dropzoneText": string;
+        "browseText": string;
     }
     interface HhFormFieldAttributes {
         "label": string;
@@ -1474,6 +2919,16 @@ declare namespace LocalJSX {
         "autocomplete": string;
         "inputmode": HTMLInputElement['inputMode'];
     }
+    interface HhMenuAttributes {
+        "open": boolean;
+        "label": string;
+        "placement": 'bottom-start' | 'bottom-end';
+    }
+    interface HhMenuItemAttributes {
+        "value": string;
+        "disabled": boolean;
+        "tone": 'default' | 'danger';
+    }
     interface HhMetricCardAttributes {
         "label": string;
         "value": string;
@@ -1488,6 +2943,18 @@ declare namespace LocalJSX {
         "active": boolean;
         "disabled": boolean;
     }
+    interface HhPaginationAttributes {
+        "page": number;
+        "pageCount": number;
+        "siblingCount": number;
+        "label": string;
+    }
+    interface HhProgressAttributes {
+        "value": number;
+        "indeterminate": boolean;
+        "label": string;
+        "tone": 'action' | 'success' | 'danger' | 'warning';
+    }
     interface HhRadioAttributes {
         "label": string;
         "checked": boolean;
@@ -1495,6 +2962,15 @@ declare namespace LocalJSX {
         "name": string;
         "value": string;
         "required": boolean;
+    }
+    interface HhSegmentedControlAttributes {
+        "value": string;
+        "label": string;
+    }
+    interface HhSegmentedItemAttributes {
+        "value": string;
+        "disabled": boolean;
+        "selected": boolean;
     }
     interface HhSelectAttributes {
         "label": string;
@@ -1504,6 +2980,20 @@ declare namespace LocalJSX {
         "required": boolean;
         "hint": string;
         "error": string;
+    }
+    interface HhSkeletonAttributes {
+        "variant": 'text' | 'circle' | 'rect';
+        "width": string;
+        "height": string;
+    }
+    interface HhSliderAttributes {
+        "value": number;
+        "min": number;
+        "max": number;
+        "step": number;
+        "label": string;
+        "disabled": boolean;
+        "showValue": boolean;
     }
     interface HhSpinnerAttributes {
         "label": string;
@@ -1541,6 +3031,22 @@ declare namespace LocalJSX {
         "readonly": boolean;
         "rows": number;
     }
+    interface HhTimePickerAttributes {
+        "label": string;
+        "name": string;
+        "value": string;
+        "min": string;
+        "max": string;
+        "step": number;
+        "hint": string;
+        "error": string;
+        "required": boolean;
+        "disabled": boolean;
+    }
+    interface HhToastRegionAttributes {
+        "placement": 'top' | 'bottom';
+        "maxVisible": number;
+    }
     interface HhTooltipAttributes {
         "text": string;
         "placement": 'top' | 'bottom';
@@ -1550,23 +3056,38 @@ declare namespace LocalJSX {
         "hh-accordion": Omit<HhAccordion, keyof HhAccordionAttributes> & { [K in keyof HhAccordion & keyof HhAccordionAttributes]?: HhAccordion[K] } & { [K in keyof HhAccordion & keyof HhAccordionAttributes as `attr:${K}`]?: HhAccordionAttributes[K] } & { [K in keyof HhAccordion & keyof HhAccordionAttributes as `prop:${K}`]?: HhAccordion[K] };
         "hh-accordion-item": Omit<HhAccordionItem, keyof HhAccordionItemAttributes> & { [K in keyof HhAccordionItem & keyof HhAccordionItemAttributes]?: HhAccordionItem[K] } & { [K in keyof HhAccordionItem & keyof HhAccordionItemAttributes as `attr:${K}`]?: HhAccordionItemAttributes[K] } & { [K in keyof HhAccordionItem & keyof HhAccordionItemAttributes as `prop:${K}`]?: HhAccordionItem[K] };
         "hh-alert": Omit<HhAlert, keyof HhAlertAttributes> & { [K in keyof HhAlert & keyof HhAlertAttributes]?: HhAlert[K] } & { [K in keyof HhAlert & keyof HhAlertAttributes as `attr:${K}`]?: HhAlertAttributes[K] } & { [K in keyof HhAlert & keyof HhAlertAttributes as `prop:${K}`]?: HhAlert[K] };
+        "hh-avatar": Omit<HhAvatar, keyof HhAvatarAttributes> & { [K in keyof HhAvatar & keyof HhAvatarAttributes]?: HhAvatar[K] } & { [K in keyof HhAvatar & keyof HhAvatarAttributes as `attr:${K}`]?: HhAvatarAttributes[K] } & { [K in keyof HhAvatar & keyof HhAvatarAttributes as `prop:${K}`]?: HhAvatar[K] };
         "hh-badge": Omit<HhBadge, keyof HhBadgeAttributes> & { [K in keyof HhBadge & keyof HhBadgeAttributes]?: HhBadge[K] } & { [K in keyof HhBadge & keyof HhBadgeAttributes as `attr:${K}`]?: HhBadgeAttributes[K] } & { [K in keyof HhBadge & keyof HhBadgeAttributes as `prop:${K}`]?: HhBadge[K] };
+        "hh-breadcrumb-item": Omit<HhBreadcrumbItem, keyof HhBreadcrumbItemAttributes> & { [K in keyof HhBreadcrumbItem & keyof HhBreadcrumbItemAttributes]?: HhBreadcrumbItem[K] } & { [K in keyof HhBreadcrumbItem & keyof HhBreadcrumbItemAttributes as `attr:${K}`]?: HhBreadcrumbItemAttributes[K] } & { [K in keyof HhBreadcrumbItem & keyof HhBreadcrumbItemAttributes as `prop:${K}`]?: HhBreadcrumbItem[K] };
+        "hh-breadcrumbs": Omit<HhBreadcrumbs, keyof HhBreadcrumbsAttributes> & { [K in keyof HhBreadcrumbs & keyof HhBreadcrumbsAttributes]?: HhBreadcrumbs[K] } & { [K in keyof HhBreadcrumbs & keyof HhBreadcrumbsAttributes as `attr:${K}`]?: HhBreadcrumbsAttributes[K] } & { [K in keyof HhBreadcrumbs & keyof HhBreadcrumbsAttributes as `prop:${K}`]?: HhBreadcrumbs[K] };
         "hh-button": Omit<HhButton, keyof HhButtonAttributes> & { [K in keyof HhButton & keyof HhButtonAttributes]?: HhButton[K] } & { [K in keyof HhButton & keyof HhButtonAttributes as `attr:${K}`]?: HhButtonAttributes[K] } & { [K in keyof HhButton & keyof HhButtonAttributes as `prop:${K}`]?: HhButton[K] };
         "hh-card": Omit<HhCard, keyof HhCardAttributes> & { [K in keyof HhCard & keyof HhCardAttributes]?: HhCard[K] } & { [K in keyof HhCard & keyof HhCardAttributes as `attr:${K}`]?: HhCardAttributes[K] } & { [K in keyof HhCard & keyof HhCardAttributes as `prop:${K}`]?: HhCard[K] };
         "hh-checkbox": Omit<HhCheckbox, keyof HhCheckboxAttributes> & { [K in keyof HhCheckbox & keyof HhCheckboxAttributes]?: HhCheckbox[K] } & { [K in keyof HhCheckbox & keyof HhCheckboxAttributes as `attr:${K}`]?: HhCheckboxAttributes[K] } & { [K in keyof HhCheckbox & keyof HhCheckboxAttributes as `prop:${K}`]?: HhCheckbox[K] };
+        "hh-combobox": Omit<HhCombobox, keyof HhComboboxAttributes> & { [K in keyof HhCombobox & keyof HhComboboxAttributes]?: HhCombobox[K] } & { [K in keyof HhCombobox & keyof HhComboboxAttributes as `attr:${K}`]?: HhComboboxAttributes[K] } & { [K in keyof HhCombobox & keyof HhComboboxAttributes as `prop:${K}`]?: HhCombobox[K] };
+        "hh-combobox-option": Omit<HhComboboxOption, keyof HhComboboxOptionAttributes> & { [K in keyof HhComboboxOption & keyof HhComboboxOptionAttributes]?: HhComboboxOption[K] } & { [K in keyof HhComboboxOption & keyof HhComboboxOptionAttributes as `attr:${K}`]?: HhComboboxOptionAttributes[K] } & { [K in keyof HhComboboxOption & keyof HhComboboxOptionAttributes as `prop:${K}`]?: HhComboboxOption[K] };
         "hh-data-table": Omit<HhDataTable, keyof HhDataTableAttributes> & { [K in keyof HhDataTable & keyof HhDataTableAttributes]?: HhDataTable[K] } & { [K in keyof HhDataTable & keyof HhDataTableAttributes as `attr:${K}`]?: HhDataTableAttributes[K] } & { [K in keyof HhDataTable & keyof HhDataTableAttributes as `prop:${K}`]?: HhDataTable[K] };
+        "hh-date-picker": Omit<HhDatePicker, keyof HhDatePickerAttributes> & { [K in keyof HhDatePicker & keyof HhDatePickerAttributes]?: HhDatePicker[K] } & { [K in keyof HhDatePicker & keyof HhDatePickerAttributes as `attr:${K}`]?: HhDatePickerAttributes[K] } & { [K in keyof HhDatePicker & keyof HhDatePickerAttributes as `prop:${K}`]?: HhDatePicker[K] };
         "hh-dialog": Omit<HhDialog, keyof HhDialogAttributes> & { [K in keyof HhDialog & keyof HhDialogAttributes]?: HhDialog[K] } & { [K in keyof HhDialog & keyof HhDialogAttributes as `attr:${K}`]?: HhDialogAttributes[K] } & { [K in keyof HhDialog & keyof HhDialogAttributes as `prop:${K}`]?: HhDialog[K] };
         "hh-drawer": Omit<HhDrawer, keyof HhDrawerAttributes> & { [K in keyof HhDrawer & keyof HhDrawerAttributes]?: HhDrawer[K] } & { [K in keyof HhDrawer & keyof HhDrawerAttributes as `attr:${K}`]?: HhDrawerAttributes[K] } & { [K in keyof HhDrawer & keyof HhDrawerAttributes as `prop:${K}`]?: HhDrawer[K] };
         "hh-empty-state": Omit<HhEmptyState, keyof HhEmptyStateAttributes> & { [K in keyof HhEmptyState & keyof HhEmptyStateAttributes]?: HhEmptyState[K] } & { [K in keyof HhEmptyState & keyof HhEmptyStateAttributes as `attr:${K}`]?: HhEmptyStateAttributes[K] } & { [K in keyof HhEmptyState & keyof HhEmptyStateAttributes as `prop:${K}`]?: HhEmptyState[K] };
+        "hh-file-upload": Omit<HhFileUpload, keyof HhFileUploadAttributes> & { [K in keyof HhFileUpload & keyof HhFileUploadAttributes]?: HhFileUpload[K] } & { [K in keyof HhFileUpload & keyof HhFileUploadAttributes as `attr:${K}`]?: HhFileUploadAttributes[K] } & { [K in keyof HhFileUpload & keyof HhFileUploadAttributes as `prop:${K}`]?: HhFileUpload[K] };
         "hh-form-field": Omit<HhFormField, keyof HhFormFieldAttributes> & { [K in keyof HhFormField & keyof HhFormFieldAttributes]?: HhFormField[K] } & { [K in keyof HhFormField & keyof HhFormFieldAttributes as `attr:${K}`]?: HhFormFieldAttributes[K] } & { [K in keyof HhFormField & keyof HhFormFieldAttributes as `prop:${K}`]?: HhFormField[K] };
         "hh-icon": Omit<HhIcon, keyof HhIconAttributes> & { [K in keyof HhIcon & keyof HhIconAttributes]?: HhIcon[K] } & { [K in keyof HhIcon & keyof HhIconAttributes as `attr:${K}`]?: HhIconAttributes[K] } & { [K in keyof HhIcon & keyof HhIconAttributes as `prop:${K}`]?: HhIcon[K] } & OneOf<"name", HhIcon["name"], HhIconAttributes["name"]>;
         "hh-icon-button": Omit<HhIconButton, keyof HhIconButtonAttributes> & { [K in keyof HhIconButton & keyof HhIconButtonAttributes]?: HhIconButton[K] } & { [K in keyof HhIconButton & keyof HhIconButtonAttributes as `attr:${K}`]?: HhIconButtonAttributes[K] } & { [K in keyof HhIconButton & keyof HhIconButtonAttributes as `prop:${K}`]?: HhIconButton[K] } & OneOf<"name", HhIconButton["name"], HhIconButtonAttributes["name"]> & OneOf<"label", HhIconButton["label"], HhIconButtonAttributes["label"]>;
         "hh-input": Omit<HhInput, keyof HhInputAttributes> & { [K in keyof HhInput & keyof HhInputAttributes]?: HhInput[K] } & { [K in keyof HhInput & keyof HhInputAttributes as `attr:${K}`]?: HhInputAttributes[K] } & { [K in keyof HhInput & keyof HhInputAttributes as `prop:${K}`]?: HhInput[K] };
+        "hh-menu": Omit<HhMenu, keyof HhMenuAttributes> & { [K in keyof HhMenu & keyof HhMenuAttributes]?: HhMenu[K] } & { [K in keyof HhMenu & keyof HhMenuAttributes as `attr:${K}`]?: HhMenuAttributes[K] } & { [K in keyof HhMenu & keyof HhMenuAttributes as `prop:${K}`]?: HhMenu[K] };
+        "hh-menu-item": Omit<HhMenuItem, keyof HhMenuItemAttributes> & { [K in keyof HhMenuItem & keyof HhMenuItemAttributes]?: HhMenuItem[K] } & { [K in keyof HhMenuItem & keyof HhMenuItemAttributes as `attr:${K}`]?: HhMenuItemAttributes[K] } & { [K in keyof HhMenuItem & keyof HhMenuItemAttributes as `prop:${K}`]?: HhMenuItem[K] };
         "hh-metric-card": Omit<HhMetricCard, keyof HhMetricCardAttributes> & { [K in keyof HhMetricCard & keyof HhMetricCardAttributes]?: HhMetricCard[K] } & { [K in keyof HhMetricCard & keyof HhMetricCardAttributes as `attr:${K}`]?: HhMetricCardAttributes[K] } & { [K in keyof HhMetricCard & keyof HhMetricCardAttributes as `prop:${K}`]?: HhMetricCard[K] };
         "hh-nav": Omit<HhNav, keyof HhNavAttributes> & { [K in keyof HhNav & keyof HhNavAttributes]?: HhNav[K] } & { [K in keyof HhNav & keyof HhNavAttributes as `attr:${K}`]?: HhNavAttributes[K] } & { [K in keyof HhNav & keyof HhNavAttributes as `prop:${K}`]?: HhNav[K] };
         "hh-nav-item": Omit<HhNavItem, keyof HhNavItemAttributes> & { [K in keyof HhNavItem & keyof HhNavItemAttributes]?: HhNavItem[K] } & { [K in keyof HhNavItem & keyof HhNavItemAttributes as `attr:${K}`]?: HhNavItemAttributes[K] } & { [K in keyof HhNavItem & keyof HhNavItemAttributes as `prop:${K}`]?: HhNavItem[K] };
+        "hh-pagination": Omit<HhPagination, keyof HhPaginationAttributes> & { [K in keyof HhPagination & keyof HhPaginationAttributes]?: HhPagination[K] } & { [K in keyof HhPagination & keyof HhPaginationAttributes as `attr:${K}`]?: HhPaginationAttributes[K] } & { [K in keyof HhPagination & keyof HhPaginationAttributes as `prop:${K}`]?: HhPagination[K] };
+        "hh-progress": Omit<HhProgress, keyof HhProgressAttributes> & { [K in keyof HhProgress & keyof HhProgressAttributes]?: HhProgress[K] } & { [K in keyof HhProgress & keyof HhProgressAttributes as `attr:${K}`]?: HhProgressAttributes[K] } & { [K in keyof HhProgress & keyof HhProgressAttributes as `prop:${K}`]?: HhProgress[K] };
         "hh-radio": Omit<HhRadio, keyof HhRadioAttributes> & { [K in keyof HhRadio & keyof HhRadioAttributes]?: HhRadio[K] } & { [K in keyof HhRadio & keyof HhRadioAttributes as `attr:${K}`]?: HhRadioAttributes[K] } & { [K in keyof HhRadio & keyof HhRadioAttributes as `prop:${K}`]?: HhRadio[K] };
+        "hh-segmented-control": Omit<HhSegmentedControl, keyof HhSegmentedControlAttributes> & { [K in keyof HhSegmentedControl & keyof HhSegmentedControlAttributes]?: HhSegmentedControl[K] } & { [K in keyof HhSegmentedControl & keyof HhSegmentedControlAttributes as `attr:${K}`]?: HhSegmentedControlAttributes[K] } & { [K in keyof HhSegmentedControl & keyof HhSegmentedControlAttributes as `prop:${K}`]?: HhSegmentedControl[K] };
+        "hh-segmented-item": Omit<HhSegmentedItem, keyof HhSegmentedItemAttributes> & { [K in keyof HhSegmentedItem & keyof HhSegmentedItemAttributes]?: HhSegmentedItem[K] } & { [K in keyof HhSegmentedItem & keyof HhSegmentedItemAttributes as `attr:${K}`]?: HhSegmentedItemAttributes[K] } & { [K in keyof HhSegmentedItem & keyof HhSegmentedItemAttributes as `prop:${K}`]?: HhSegmentedItem[K] };
         "hh-select": Omit<HhSelect, keyof HhSelectAttributes> & { [K in keyof HhSelect & keyof HhSelectAttributes]?: HhSelect[K] } & { [K in keyof HhSelect & keyof HhSelectAttributes as `attr:${K}`]?: HhSelectAttributes[K] } & { [K in keyof HhSelect & keyof HhSelectAttributes as `prop:${K}`]?: HhSelect[K] };
+        "hh-skeleton": Omit<HhSkeleton, keyof HhSkeletonAttributes> & { [K in keyof HhSkeleton & keyof HhSkeletonAttributes]?: HhSkeleton[K] } & { [K in keyof HhSkeleton & keyof HhSkeletonAttributes as `attr:${K}`]?: HhSkeletonAttributes[K] } & { [K in keyof HhSkeleton & keyof HhSkeletonAttributes as `prop:${K}`]?: HhSkeleton[K] };
+        "hh-slider": Omit<HhSlider, keyof HhSliderAttributes> & { [K in keyof HhSlider & keyof HhSliderAttributes]?: HhSlider[K] } & { [K in keyof HhSlider & keyof HhSliderAttributes as `attr:${K}`]?: HhSliderAttributes[K] } & { [K in keyof HhSlider & keyof HhSliderAttributes as `prop:${K}`]?: HhSlider[K] };
         "hh-spinner": Omit<HhSpinner, keyof HhSpinnerAttributes> & { [K in keyof HhSpinner & keyof HhSpinnerAttributes]?: HhSpinner[K] } & { [K in keyof HhSpinner & keyof HhSpinnerAttributes as `attr:${K}`]?: HhSpinnerAttributes[K] } & { [K in keyof HhSpinner & keyof HhSpinnerAttributes as `prop:${K}`]?: HhSpinner[K] };
         "hh-status": Omit<HhStatus, keyof HhStatusAttributes> & { [K in keyof HhStatus & keyof HhStatusAttributes]?: HhStatus[K] } & { [K in keyof HhStatus & keyof HhStatusAttributes as `attr:${K}`]?: HhStatusAttributes[K] } & { [K in keyof HhStatus & keyof HhStatusAttributes as `prop:${K}`]?: HhStatus[K] };
         "hh-switch": Omit<HhSwitch, keyof HhSwitchAttributes> & { [K in keyof HhSwitch & keyof HhSwitchAttributes]?: HhSwitch[K] } & { [K in keyof HhSwitch & keyof HhSwitchAttributes as `attr:${K}`]?: HhSwitchAttributes[K] } & { [K in keyof HhSwitch & keyof HhSwitchAttributes as `prop:${K}`]?: HhSwitch[K] };
@@ -1574,6 +3095,8 @@ declare namespace LocalJSX {
         "hh-tab-panel": Omit<HhTabPanel, keyof HhTabPanelAttributes> & { [K in keyof HhTabPanel & keyof HhTabPanelAttributes]?: HhTabPanel[K] } & { [K in keyof HhTabPanel & keyof HhTabPanelAttributes as `attr:${K}`]?: HhTabPanelAttributes[K] } & { [K in keyof HhTabPanel & keyof HhTabPanelAttributes as `prop:${K}`]?: HhTabPanel[K] } & OneOf<"value", HhTabPanel["value"], HhTabPanelAttributes["value"]>;
         "hh-tabs": Omit<HhTabs, keyof HhTabsAttributes> & { [K in keyof HhTabs & keyof HhTabsAttributes]?: HhTabs[K] } & { [K in keyof HhTabs & keyof HhTabsAttributes as `attr:${K}`]?: HhTabsAttributes[K] } & { [K in keyof HhTabs & keyof HhTabsAttributes as `prop:${K}`]?: HhTabs[K] };
         "hh-textarea": Omit<HhTextarea, keyof HhTextareaAttributes> & { [K in keyof HhTextarea & keyof HhTextareaAttributes]?: HhTextarea[K] } & { [K in keyof HhTextarea & keyof HhTextareaAttributes as `attr:${K}`]?: HhTextareaAttributes[K] } & { [K in keyof HhTextarea & keyof HhTextareaAttributes as `prop:${K}`]?: HhTextarea[K] };
+        "hh-time-picker": Omit<HhTimePicker, keyof HhTimePickerAttributes> & { [K in keyof HhTimePicker & keyof HhTimePickerAttributes]?: HhTimePicker[K] } & { [K in keyof HhTimePicker & keyof HhTimePickerAttributes as `attr:${K}`]?: HhTimePickerAttributes[K] } & { [K in keyof HhTimePicker & keyof HhTimePickerAttributes as `prop:${K}`]?: HhTimePicker[K] };
+        "hh-toast-region": Omit<HhToastRegion, keyof HhToastRegionAttributes> & { [K in keyof HhToastRegion & keyof HhToastRegionAttributes]?: HhToastRegion[K] } & { [K in keyof HhToastRegion & keyof HhToastRegionAttributes as `attr:${K}`]?: HhToastRegionAttributes[K] } & { [K in keyof HhToastRegion & keyof HhToastRegionAttributes as `prop:${K}`]?: HhToastRegion[K] };
         "hh-toolbar": HhToolbar;
         "hh-tooltip": Omit<HhTooltip, keyof HhTooltipAttributes> & { [K in keyof HhTooltip & keyof HhTooltipAttributes]?: HhTooltip[K] } & { [K in keyof HhTooltip & keyof HhTooltipAttributes as `attr:${K}`]?: HhTooltipAttributes[K] } & { [K in keyof HhTooltip & keyof HhTooltipAttributes as `prop:${K}`]?: HhTooltip[K] };
     }
@@ -1585,23 +3108,120 @@ declare module "@stencil/core" {
             "hh-accordion": LocalJSX.IntrinsicElements["hh-accordion"] & JSXBase.HTMLAttributes<HTMLHhAccordionElement>;
             "hh-accordion-item": LocalJSX.IntrinsicElements["hh-accordion-item"] & JSXBase.HTMLAttributes<HTMLHhAccordionItemElement>;
             "hh-alert": LocalJSX.IntrinsicElements["hh-alert"] & JSXBase.HTMLAttributes<HTMLHhAlertElement>;
+            "hh-avatar": LocalJSX.IntrinsicElements["hh-avatar"] & JSXBase.HTMLAttributes<HTMLHhAvatarElement>;
             "hh-badge": LocalJSX.IntrinsicElements["hh-badge"] & JSXBase.HTMLAttributes<HTMLHhBadgeElement>;
+            "hh-breadcrumb-item": LocalJSX.IntrinsicElements["hh-breadcrumb-item"] & JSXBase.HTMLAttributes<HTMLHhBreadcrumbItemElement>;
+            /**
+             * Wraps slotted `<hh-breadcrumb-item>` children, marking the last item as
+             * the current page and (optionally) collapsing the middle items behind a
+             * clickable ellipsis when there are more than `maxItems`.
+             *   <hh-breadcrumbs max-items="3">
+             *     <hh-breadcrumb-item href="/">Home</hh-breadcrumb-item>
+             *     <hh-breadcrumb-item href="/settings">Settings</hh-breadcrumb-item>
+             *     <hh-breadcrumb-item href="/settings/team">Team</hh-breadcrumb-item>
+             *     <hh-breadcrumb-item>Profile</hh-breadcrumb-item>
+             *   </hh-breadcrumbs>
+             * `shadow: false` means slotted items are real light-DOM children of the
+             * host, so collapsing is done by inserting/removing a real ellipsis <li>
+             * node next to them rather than trying to reorder projected slot content.
+             */
+            "hh-breadcrumbs": LocalJSX.IntrinsicElements["hh-breadcrumbs"] & JSXBase.HTMLAttributes<HTMLHhBreadcrumbsElement>;
             "hh-button": LocalJSX.IntrinsicElements["hh-button"] & JSXBase.HTMLAttributes<HTMLHhButtonElement>;
             "hh-card": LocalJSX.IntrinsicElements["hh-card"] & JSXBase.HTMLAttributes<HTMLHhCardElement>;
             "hh-checkbox": LocalJSX.IntrinsicElements["hh-checkbox"] & JSXBase.HTMLAttributes<HTMLHhCheckboxElement>;
+            /**
+             * Type-ahead combobox following the WAI-ARIA 1.2 combobox pattern (input
+             * with `role="combobox"` + a `role="listbox"` popup, `aria-activedescendant`
+             * driving keyboard selection rather than moving real DOM focus).
+             *   <hh-combobox label="Country" name="country" value="us">
+             *     <hh-combobox-option value="us">United States</hh-combobox-option>
+             *     <hh-combobox-option value="ca">Canada</hh-combobox-option>
+             *     <hh-combobox-option value="mx">Mexico</hh-combobox-option>
+             *   </hh-combobox>
+             * Filtering is real (substring match against each option's text, live as
+             * you type) — it operates on the actual slotted `<hh-combobox-option>`
+             * elements (toggling `matched`/`active`/`selected` attributes on them, the
+             * same light-DOM-child pattern used by `hh-breadcrumbs`/`hh-segmented-control`)
+             * rather than re-rendering a parallel copy of the options.
+             * Set `allow-custom-value` to let the input's raw text become the value when
+             * it doesn't match any option (e.g. a tags field); otherwise the input
+             * reverts to the last matched option's label on blur/Escape.
+             */
+            "hh-combobox": LocalJSX.IntrinsicElements["hh-combobox"] & JSXBase.HTMLAttributes<HTMLHhComboboxElement>;
+            "hh-combobox-option": LocalJSX.IntrinsicElements["hh-combobox-option"] & JSXBase.HTMLAttributes<HTMLHhComboboxOptionElement>;
+            /**
+             * A real interactive table: click a sortable column header to sort by it
+             * (asc → desc → none), type in the filter box to filter across all column
+             * values, and page through results — not just a static markup demo.
+             * Sorting/filtering/pagination all run client-side over `rows`; for
+             * server-side paging, listen for `hhPageChange`/`hhSortChange`/`hhFilterChange`
+             * and re-fetch instead of relying on the internal state.
+             */
             "hh-data-table": LocalJSX.IntrinsicElements["hh-data-table"] & JSXBase.HTMLAttributes<HTMLHhDataTableElement>;
+            /**
+             * Calendar-grid date picker (WAI-ARIA date picker dialog pattern: a text
+             * input + a `role="dialog"` popup containing a `role="grid"` of real day
+             * `<button>`s with roving tabindex — arrow keys move actual DOM focus
+             * between days, not just `aria-activedescendant`).
+             * The stored/emitted `value` is always ISO `yyyy-mm-dd`, matching native
+             * `<input type="date">` semantics, regardless of the `locale` used to
+             * render weekday/month labels in the calendar UI itself — so a Spanish or
+             * French `locale` prop changes what the calendar *looks like* without
+             * changing what other code needs to parse.
+             *   <hh-date-picker label="Fecha de viaje" locale="es-BO" first-day-of-week="1" />
+             */
+            "hh-date-picker": LocalJSX.IntrinsicElements["hh-date-picker"] & JSXBase.HTMLAttributes<HTMLHhDatePickerElement>;
             "hh-dialog": LocalJSX.IntrinsicElements["hh-dialog"] & JSXBase.HTMLAttributes<HTMLHhDialogElement>;
             "hh-drawer": LocalJSX.IntrinsicElements["hh-drawer"] & JSXBase.HTMLAttributes<HTMLHhDrawerElement>;
             "hh-empty-state": LocalJSX.IntrinsicElements["hh-empty-state"] & JSXBase.HTMLAttributes<HTMLHhEmptyStateElement>;
+            /**
+             * Real drag-and-drop + click-to-browse upload with client-side accept/size
+             * validation — not just a styled `<input type="file">`. The native input
+             * stays in the DOM (visually hidden, but a real element) so the platform
+             * file dialog and native drag events both work; this component adds the
+             * dropzone, validation, and the selected-files list around it.
+             * Client-side validation is a UX convenience, not a security boundary —
+             * always re-validate file type/size server-side.
+             */
+            "hh-file-upload": LocalJSX.IntrinsicElements["hh-file-upload"] & JSXBase.HTMLAttributes<HTMLHhFileUploadElement>;
             "hh-form-field": LocalJSX.IntrinsicElements["hh-form-field"] & JSXBase.HTMLAttributes<HTMLHhFormFieldElement>;
             "hh-icon": LocalJSX.IntrinsicElements["hh-icon"] & JSXBase.HTMLAttributes<HTMLHhIconElement>;
             "hh-icon-button": LocalJSX.IntrinsicElements["hh-icon-button"] & JSXBase.HTMLAttributes<HTMLHhIconButtonElement>;
             "hh-input": LocalJSX.IntrinsicElements["hh-input"] & JSXBase.HTMLAttributes<HTMLHhInputElement>;
+            /**
+             * A trigger + popover menu. The first slotted element (typically an
+             * `<hh-button>` or `<hh-icon-button>` with `slot="trigger"`) opens the menu;
+             * slotted `<hh-menu-item>` children make up the menu content.
+             *   <hh-menu label="Row actions">
+             *     <hh-button slot="trigger">Actions</hh-button>
+             *     <hh-menu-item value="edit">Edit</hh-menu-item>
+             *     <hh-menu-item value="duplicate">Duplicate</hh-menu-item>
+             *     <hh-menu-item value="delete" tone="danger">Delete</hh-menu-item>
+             *   </hh-menu>
+             */
+            "hh-menu": LocalJSX.IntrinsicElements["hh-menu"] & JSXBase.HTMLAttributes<HTMLHhMenuElement>;
+            "hh-menu-item": LocalJSX.IntrinsicElements["hh-menu-item"] & JSXBase.HTMLAttributes<HTMLHhMenuItemElement>;
             "hh-metric-card": LocalJSX.IntrinsicElements["hh-metric-card"] & JSXBase.HTMLAttributes<HTMLHhMetricCardElement>;
             "hh-nav": LocalJSX.IntrinsicElements["hh-nav"] & JSXBase.HTMLAttributes<HTMLHhNavElement>;
             "hh-nav-item": LocalJSX.IntrinsicElements["hh-nav-item"] & JSXBase.HTMLAttributes<HTMLHhNavItemElement>;
+            "hh-pagination": LocalJSX.IntrinsicElements["hh-pagination"] & JSXBase.HTMLAttributes<HTMLHhPaginationElement>;
+            /**
+             * Linear progress bar. Pairs with `<hh-spinner>` (circular, indeterminate-only).
+             */
+            "hh-progress": LocalJSX.IntrinsicElements["hh-progress"] & JSXBase.HTMLAttributes<HTMLHhProgressElement>;
             "hh-radio": LocalJSX.IntrinsicElements["hh-radio"] & JSXBase.HTMLAttributes<HTMLHhRadioElement>;
+            /**
+             * <hh-segmented-control value="week" label="Range">
+             *   <hh-segmented-item value="day">Day</hh-segmented-item>
+             *   <hh-segmented-item value="week">Week</hh-segmented-item>
+             *   <hh-segmented-item value="month">Month</hh-segmented-item>
+             * </hh-segmented-control>
+             */
+            "hh-segmented-control": LocalJSX.IntrinsicElements["hh-segmented-control"] & JSXBase.HTMLAttributes<HTMLHhSegmentedControlElement>;
+            "hh-segmented-item": LocalJSX.IntrinsicElements["hh-segmented-item"] & JSXBase.HTMLAttributes<HTMLHhSegmentedItemElement>;
             "hh-select": LocalJSX.IntrinsicElements["hh-select"] & JSXBase.HTMLAttributes<HTMLHhSelectElement>;
+            "hh-skeleton": LocalJSX.IntrinsicElements["hh-skeleton"] & JSXBase.HTMLAttributes<HTMLHhSkeletonElement>;
+            "hh-slider": LocalJSX.IntrinsicElements["hh-slider"] & JSXBase.HTMLAttributes<HTMLHhSliderElement>;
             "hh-spinner": LocalJSX.IntrinsicElements["hh-spinner"] & JSXBase.HTMLAttributes<HTMLHhSpinnerElement>;
             "hh-status": LocalJSX.IntrinsicElements["hh-status"] & JSXBase.HTMLAttributes<HTMLHhStatusElement>;
             "hh-switch": LocalJSX.IntrinsicElements["hh-switch"] & JSXBase.HTMLAttributes<HTMLHhSwitchElement>;
@@ -1609,6 +3229,29 @@ declare module "@stencil/core" {
             "hh-tab-panel": LocalJSX.IntrinsicElements["hh-tab-panel"] & JSXBase.HTMLAttributes<HTMLHhTabPanelElement>;
             "hh-tabs": LocalJSX.IntrinsicElements["hh-tabs"] & JSXBase.HTMLAttributes<HTMLHhTabsElement>;
             "hh-textarea": LocalJSX.IntrinsicElements["hh-textarea"] & JSXBase.HTMLAttributes<HTMLHhTextareaElement>;
+            /**
+             * Wraps the native `<input type="time">` rather than a hand-rolled
+             * scroll-wheel widget: native time inputs already give consistent keyboard
+             * support (arrow keys increment hour/minute/AM-PM segments) and a
+             * platform-appropriate picker UI (spinner on desktop, wheel on mobile/iOS,
+             * clock UI on Android) with better baseline accessibility than a custom
+             * widget could realistically reach in this pass. `hh-date-picker` gets a
+             * custom calendar because native `<input type="date">`'s UX/a11y is
+             * inconsistent across browsers in ways that matter for a design system;
+             * `<input type="time">` doesn't have the same problem, so this component
+             * is a thin, consistently-styled wrapper instead of a reimplementation.
+             */
+            "hh-time-picker": LocalJSX.IntrinsicElements["hh-time-picker"] & JSXBase.HTMLAttributes<HTMLHhTimePickerElement>;
+            /**
+             * A single region that owns a real dismiss queue (not just a visual list) —
+             * new toasts queue behind `maxVisible` active ones and promote automatically
+             * as older toasts are dismissed or time out. Mount one `<hh-toast-region>`
+             * per app (or per surface that needs its own notification area) and call
+             * `.show()` on it via a ref, e.g.:
+             *   const region = document.querySelector('hh-toast-region');
+             *   await region.show({ tone: 'success', message: 'Saved.' });
+             */
+            "hh-toast-region": LocalJSX.IntrinsicElements["hh-toast-region"] & JSXBase.HTMLAttributes<HTMLHhToastRegionElement>;
             "hh-toolbar": LocalJSX.IntrinsicElements["hh-toolbar"] & JSXBase.HTMLAttributes<HTMLHhToolbarElement>;
             "hh-tooltip": LocalJSX.IntrinsicElements["hh-tooltip"] & JSXBase.HTMLAttributes<HTMLHhTooltipElement>;
         }

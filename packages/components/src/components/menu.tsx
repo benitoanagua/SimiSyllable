@@ -24,6 +24,14 @@ export class HhMenu {
   @State() private items: HTMLElement[] = [];
   private root?: HTMLElement;
   private trigger?: HTMLElement;
+  private list?: HTMLElement;
+
+  private bindList = (el?: HTMLElement) => {
+    if (el === this.list) return;
+    this.list?.removeEventListener('hhSelect', this.onItemSelect as EventListener);
+    this.list = el;
+    this.list?.addEventListener('hhSelect', this.onItemSelect as EventListener);
+  };
 
   @Method() async show() { this.setOpen(true); }
   @Method() async close() { this.setOpen(false); }
@@ -34,6 +42,7 @@ export class HhMenu {
   }
   disconnectedCallback() {
     document.removeEventListener('click', this.onDocumentClick, true);
+    this.list?.removeEventListener('hhSelect', this.onItemSelect as EventListener);
   }
 
   private refreshItems = () => {
@@ -88,7 +97,7 @@ export class HhMenu {
           role="menu"
           aria-label={this.label || undefined}
           hidden={!this.open}
-          onHhSelect={this.onItemSelect}
+          ref={(el) => this.bindList(el as HTMLElement | undefined)}
         >
           <slot onSlotchange={this.refreshItems} />
         </div>
