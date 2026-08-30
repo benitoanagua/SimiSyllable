@@ -1,8 +1,9 @@
+import { stencilContent } from './story-helpers';
+
 export default { title: 'HANDHELD/Visual/State Matrix' };
 
 export const Controls = {
-  render: () => ({
-    template: `
+  render: () => stencilContent(`
       <div style="display:grid;gap:32px;padding:32px;max-width:960px;background:var(--hh-color-background);color:var(--hh-color-text)">
         <section style="display:grid;gap:12px">
           <h2>Buttons</h2>
@@ -29,6 +30,5 @@ export const Controls = {
           <hh-badge tone="danger">Danger</hh-badge>
         </section>
       </div>
-    `,
-  }),
+    `),
 };

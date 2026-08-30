@@ -8,6 +8,10 @@
     ".": {
       "types": "./dist/types/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./loader": {
+      "types": "./dist/loader/index.d.ts",
+      "import": "./dist/loader/index.js"
     }
   },
   "scripts": {
@@ -17,7 +21,6 @@
     "lint": "node ../../tooling/lint/package-rules.mjs components"
   },
   "dependencies": {
-    "@handheld/foundation": "workspace:*",
     "@handheld/icons": "workspace:*",
     "@handheld/tokens": "workspace:*"
   },

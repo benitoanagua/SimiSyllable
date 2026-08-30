@@ -13,8 +13,7 @@
   },
   "devDependencies": {
     "@storybook/addon-essentials": "^8.6.18",
-    "@storybook/web-components-vite": "^8.6.18",
     "storybook": "^8.6.18",
-    "@storybook/web-components": "^8.6.18"
+    "@stencil/storybook-plugin": "^0.7.0"
   }
 }

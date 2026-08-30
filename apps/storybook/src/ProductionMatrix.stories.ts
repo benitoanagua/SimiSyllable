@@ -1,3 +1,5 @@
+import { stencilContent } from './story-helpers';
+
 export default {
   title: 'HANDHELD/Quality/Production Matrix',
 };
@@ -29,4 +31,4 @@ const controls = `
     </section>
   </div>`;
 
-export const Production = { render: () => ({ template: controls }) };
+export const Production = { render: () => stencilContent(controls) };

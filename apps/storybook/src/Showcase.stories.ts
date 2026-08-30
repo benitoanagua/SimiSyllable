@@ -1,8 +1,9 @@
+import { stencilContent } from './story-helpers';
+
 export default { title: 'HANDHELD/Showcase' };
 
 export const ProductSurface = {
-  render: () => ({
-    template: `
+  render: () => stencilContent(`
       <div style="display:grid;gap:24px;padding:32px;max-width:1100px;background:var(--hh-color-background);color:var(--hh-color-text)">
         <div style="display:grid;gap:8px">
           <span style="font-size:.75rem;color:var(--hh-color-text-muted);text-transform:uppercase;letter-spacing:.08em">Composable UI</span>
@@ -36,5 +37,5 @@ export const ProductSurface = {
 };
 
 export const Responsive = {
-  render: () => ({ template: `<div style="padding:24px;max-width:720px"><hh-toolbar><span slot="start">Filters</span><hh-input placeholder="Search" aria-label="Search"></hh-input><div slot="end"><hh-button variant="secondary">Reset</hh-button><hh-button>Apply</hh-button></div></hh-toolbar></div>` }),
+  render: () => stencilContent(`<div style="padding:24px;max-width:720px"><hh-toolbar><span slot="start">Filters</span><hh-input placeholder="Search" aria-label="Search"></hh-input><div slot="end"><hh-button variant="secondary">Reset</hh-button><hh-button>Apply</hh-button></div></hh-toolbar></div>`),
 };

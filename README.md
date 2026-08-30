@@ -19,7 +19,6 @@ HANDHELD is a design system built from scratch with Stencil, TypeScript and Web 
 - `@handheld/primitives` — small layout/surface primitives.
 - `@handheld/icons` — the Tabler icon data used by `hh-icon`.
 - `@handheld/components` — canonical Web Components.
-- `@handheld/patterns` — higher-level compositions.
 - `@handheld/testing` — visual and accessibility test infrastructure.
 
 ## Icon usage

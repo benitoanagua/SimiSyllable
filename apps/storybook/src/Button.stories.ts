@@ -1,6 +1,28 @@
-import type { Meta } from '@storybook/web-components-vite';
-const meta: Meta = { title: 'HANDHELD/Components/Button' };
+import type { Meta } from '@stencil/storybook-plugin';
+import { h } from '@stencil/core';
+import { HhButton } from '@handheld/components';
+
+const meta = {
+  title: 'HANDHELD/Components/Button',
+  component: HhButton,
+} satisfies Meta<HhButton>;
+
 export default meta;
-export const Primary = { render: () => ({ template: '<hh-button>Continue</hh-button>' }) };
-export const Secondary = { render: () => ({ template: '<hh-button variant="secondary">Cancel</hh-button>' }) };
-export const WithIcons = { render: () => ({ template: '<hh-button><hh-icon slot="start" name="add"></hh-icon>Create</hh-button>' }) };
+
+export const Primary = {
+  render: () => h('hh-button', null, 'Continue'),
+};
+
+export const Secondary = {
+  render: () => h('hh-button', { variant: 'secondary' }, 'Cancel'),
+};
+
+export const WithIcons = {
+  render: () =>
+    h(
+      'hh-button',
+      null,
+      h('hh-icon', { slot: 'start', name: 'add' }),
+      'Create',
+    ),
+};

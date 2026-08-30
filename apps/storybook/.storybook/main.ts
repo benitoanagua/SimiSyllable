@@ -1,7 +1,12 @@
-import type { StorybookConfig } from '@storybook/web-components-vite';
+import type { StorybookConfig } from '@stencil/storybook-plugin';
+
 const config: StorybookConfig = {
   stories: ['../src/**/*.stories.@(ts|tsx|js)'],
   addons: ['@storybook/addon-essentials'],
-  framework: { name: '@storybook/web-components-vite', options: {} },
+  framework: {
+    name: '@stencil/storybook-plugin',
+    options: {},
+  },
 };
+
 export default config;
