@@ -14,7 +14,7 @@ export class HhSelect {
   private select?: HTMLSelectElement;
 
   @Method()
-  async focus() { this.select?.focus(); }
+  async focusControl() { this.select?.focus(); }
 
   componentDidRender() {
     if (this.select) this.select.value = this.value;

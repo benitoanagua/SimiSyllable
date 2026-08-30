@@ -20,7 +20,7 @@ export class HhInput {
   private input?: HTMLInputElement;
 
   @Method()
-  async focus() { this.input?.focus(); }
+  async focusControl() { this.input?.focus(); }
 
   @Method()
   async select() { this.input?.select(); }

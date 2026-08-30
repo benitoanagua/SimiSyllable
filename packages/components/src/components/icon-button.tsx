@@ -12,7 +12,7 @@ export class HhIconButton {
   private control?: HTMLButtonElement;
 
   @Method()
-  async focus() { this.control?.focus(); }
+  async focusControl() { this.control?.focus(); }
 
   render() {
     return (

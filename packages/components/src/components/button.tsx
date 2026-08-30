@@ -16,7 +16,7 @@ export class HhButton {
   private control?: HTMLButtonElement;
 
   @Method()
-  async focus() { this.control?.focus(); }
+  async focusControl() { this.control?.focus(); }
 
   private handleClick = (event: MouseEvent) => {
     if (!this.disabled && !this.loading) this.hhPress.emit(event);

@@ -18,7 +18,7 @@ export class HhTextarea {
   private control?: HTMLTextAreaElement;
 
   @Method()
-  async focus() { this.control?.focus(); }
+  async focusControl() { this.control?.focus(); }
 
   private id() { return this.host.id || `hh-textarea-${this.name || 'field'}`; }
   private onInput = (event: Event) => { this.value = (event.target as HTMLTextAreaElement).value; this.hhInput.emit(this.value); };

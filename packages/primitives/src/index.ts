@@ -1,2 +1,2 @@
-export * from './hh-stack';
-export * from './hh-surface';
+export { HhStack } from './hh-stack';
+export { HhSurface } from './hh-surface';
