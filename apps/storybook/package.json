@@ -12,8 +12,8 @@
     "@handheld/tokens": "workspace:*"
   },
   "devDependencies": {
-    "@storybook/addon-essentials": "^8.6.18",
-    "storybook": "^8.6.18",
+    "@storybook/addon-essentials": "^10.5.10",
+    "storybook": "^10.5.10",
     "@stencil/storybook-plugin": "^0.7.0"
   }
 }

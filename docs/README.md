@@ -8,7 +8,6 @@ Documentation areas:
 - architecture
 - foundations
 - components
-- patterns
 - accessibility
 - visual regression
 - framework integrations

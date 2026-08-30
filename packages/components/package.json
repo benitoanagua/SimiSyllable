@@ -21,6 +21,7 @@
     "lint": "node ../../tooling/lint/package-rules.mjs components"
   },
   "dependencies": {
+    "@handheld/foundation": "workspace:*",
     "@handheld/icons": "workspace:*",
     "@handheld/tokens": "workspace:*"
   },

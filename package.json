@@ -2,7 +2,7 @@
   "name": "handheld-design-system",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@10.0.0",
+  "packageManager": "pnpm@10.26.0",
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
@@ -16,7 +16,7 @@
     "test:showcase": "pnpm --filter @handheld/showcase test",
     "test:visual": "pnpm --filter @handheld/testing test:visual",
     "test:visual:update": "pnpm --filter @handheld/testing test:visual -- --update-snapshots",
-    "check": "pnpm check:icons && pnpm check:framework && pnpm check:api && pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm build:storybook",
+    "check": "pnpm check:icons && pnpm check:framework && pnpm check:api && pnpm check:dependencies && pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm build:storybook",
     "release": "changeset publish",
     "format:check": "prettier --check .",
     "format": "prettier --write .",
@@ -25,7 +25,7 @@
     "test:a11y": "pnpm --filter @handheld/testing test:a11y",
     "format:repair": "prettier --write .",
     "check:framework": "node tooling/validation/no-lit.mjs",
-    "check:api": "node tooling/validation/public-api.mjs"
+    "check:dependencies": "node tooling/validation/dependency-consistency.mjs"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.0",

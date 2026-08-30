@@ -4,7 +4,7 @@ HANDHELD is an independent design system. STRATA is referenced only for reposito
 
 ## Layers
 
-`tokens → foundation → primitives/components → adapters`
+`tokens → foundation → primitives → components`
 
 Dependencies must point downward in this diagram only. Application/domain code does not belong in HANDHELD.
 

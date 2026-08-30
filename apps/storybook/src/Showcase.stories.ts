@@ -32,8 +32,7 @@ export const ProductSurface = {
           <hh-empty-state heading="No saved views" description="Create a view to keep your favorite filters close at hand."><hh-icon slot="icon" name="settings" aria-label=""></hh-icon><div slot="actions"><hh-button variant="secondary">Learn more</hh-button><hh-button>Create view</hh-button></div></hh-empty-state>
         </div>
       </div>
-    `,
-  }),
+    `),
 };
 
 export const Responsive = {
