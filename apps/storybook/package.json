@@ -1,0 +1,8 @@
+{
+  "name": "@handheld/storybook",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": { "storybook": "storybook dev -p 6006", "build-storybook": "storybook build" },
+  "dependencies": { "@handheld/components": "workspace:*", "@handheld/primitives": "workspace:*", "@handheld/tokens": "workspace:*" },
+  "devDependencies": { "@storybook/addon-essentials": "^8.6.0", "@storybook/web-components-vite": "^8.6.0", "storybook": "^8.6.0" }
+}

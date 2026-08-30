@@ -1,0 +1,7 @@
+:host { display: block; }
+.hh-stack {
+  display: flex;
+  flex-direction: var(--hh-stack-direction, column);
+  gap: var(--hh-stack-gap, var(--hh-space-4));
+  align-items: var(--hh-stack-align, stretch);
+}

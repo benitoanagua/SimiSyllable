@@ -1,0 +1,2 @@
+:host { display: inline-block; }
+.choice { display: inline-flex; align-items: center; gap: var(--hh-space-2); color: var(--hh-color-text); cursor: pointer; font-family: var(--hh-font-family-sans); }.choice input { accent-color: var(--hh-color-action); width: 1rem; height: 1rem; }.choice input:disabled { cursor: not-allowed; }.choice:has(input:disabled) { opacity: .55; cursor: not-allowed; }

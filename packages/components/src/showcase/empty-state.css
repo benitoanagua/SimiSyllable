@@ -1,0 +1,5 @@
+.hh-empty-state { display:grid; justify-items:center; gap:10px; padding:40px 24px; text-align:center; border:1px dashed var(--hh-color-border); border-radius:var(--hh-radius-lg); background:var(--hh-color-surface); color:var(--hh-color-text); }
+.hh-empty-state__icon { display:grid; place-items:center; width:48px; height:48px; border-radius:50%; background:var(--hh-color-background); color:var(--hh-color-text-muted); font-size:24px; }
+.hh-empty-state h3,.hh-empty-state p { margin:0; }
+.hh-empty-state p { max-width:46ch; color:var(--hh-color-text-muted); }
+.hh-empty-state__actions { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:6px; }

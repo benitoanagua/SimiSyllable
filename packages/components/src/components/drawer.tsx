@@ -1,0 +1,63 @@
+import { Component, Element, Event, EventEmitter, Method, Prop, h } from '@stencil/core';
+
+@Component({ tag: 'hh-drawer', styleUrl: 'drawer.css', shadow: false })
+export class HhDrawer {
+  @Element() host!: HTMLElement;
+  @Prop({ mutable: true }) open = false;
+  @Prop() label = '';
+  @Prop() side: 'left' | 'right' = 'right';
+  @Prop() closeOnEscape = true;
+  @Event() hhOpen!: EventEmitter<void>;
+  @Event() hhClose!: EventEmitter<void>;
+  private previousFocus?: HTMLElement;
+  private wasOpen = false;
+
+  @Method() async show() { this.open = true; }
+  @Method() async close() { this.open = false; }
+
+  componentDidRender() {
+    if (this.open && !this.wasOpen) {
+      this.previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : undefined;
+      document.body.classList.add('hh-drawer-open');
+      this.hhOpen.emit();
+      requestAnimationFrame(() => this.host.querySelector<HTMLElement>('.drawer .close')?.focus());
+    }
+    if (!this.open && this.wasOpen) {
+      document.body.classList.remove('hh-drawer-open');
+      const target = this.previousFocus;
+      this.previousFocus = undefined;
+      this.hhClose.emit();
+      requestAnimationFrame(() => target?.focus());
+    }
+    this.wasOpen = this.open;
+  }
+
+  disconnectedCallback() {
+    document.body.classList.remove('hh-drawer-open');
+  }
+
+  private onKeyDown = (event: KeyboardEvent) => {
+    if (this.open && event.key === 'Escape' && this.closeOnEscape) {
+      event.preventDefault();
+      this.open = false;
+    }
+  };
+
+  render() {
+    if (!this.open) return null;
+    const titleId = `${this.host.id || 'hh-drawer'}-title`;
+    return (
+      <div class="drawer-root" onKeyDown={this.onKeyDown}>
+        <button class="scrim" type="button" aria-label="Close navigation" onClick={() => { this.open = false; }}></button>
+        <aside class={`drawer is-${this.side}`} role="dialog" aria-modal="true" aria-labelledby={this.label ? titleId : undefined}>
+          <header>
+            {this.label ? <h2 id={titleId}>{this.label}</h2> : null}
+            <button class="close" type="button" aria-label="Close" onClick={() => { this.open = false; }}><hh-icon name="x" /></button>
+          </header>
+          <div class="body"><slot /></div>
+          <footer><slot name="footer" /></footer>
+        </aside>
+      </div>
+    );
+  }
+}

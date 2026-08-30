@@ -1,0 +1,8 @@
+.hh-data-table { overflow:auto; border:1px solid var(--hh-color-border); border-radius:var(--hh-radius-lg); background:var(--hh-color-surface); }
+.hh-data-table:focus-visible { outline:2px solid var(--hh-color-action); outline-offset:2px; }
+.hh-data-table table { width:100%; min-width:520px; border-collapse:collapse; color:var(--hh-color-text); }
+.hh-data-table caption { padding:14px 16px; text-align:left; font-weight:700; }
+.hh-data-table th,.hh-data-table td { padding:12px 16px; border-top:1px solid var(--hh-color-border); text-align:left; white-space:nowrap; }
+.hh-data-table th { color:var(--hh-color-text-muted); font-size:.75rem; text-transform:uppercase; letter-spacing:.06em; }
+.hh-data-table .numeric { text-align:right; font-variant-numeric:tabular-nums; }
+.hh-data-table tbody tr:hover { background:var(--hh-color-background); }

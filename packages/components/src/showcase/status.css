@@ -1,0 +1,6 @@
+.hh-status { display:inline-flex; align-items:center; gap:7px; min-height:28px; padding:4px 10px; border:1px solid var(--hh-color-border); border-radius:999px; font-size:.8125rem; font-weight:600; background:var(--hh-color-surface); color:var(--hh-color-text); }
+.hh-status__dot { width:7px; height:7px; border-radius:50%; background:currentColor; }
+.hh-status--success { color:var(--hh-color-success); }
+.hh-status--warning { color:var(--hh-color-warning); }
+.hh-status--danger { color:var(--hh-color-danger); }
+.hh-status--info { color:var(--hh-color-action); }

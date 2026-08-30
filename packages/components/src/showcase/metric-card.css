@@ -1,0 +1,7 @@
+.hh-metric-card { display:grid; gap:8px; padding:20px; border:1px solid var(--hh-color-border); border-radius:var(--hh-radius-lg); background:var(--hh-color-surface); color:var(--hh-color-text); min-width:0; }
+.hh-metric-card__top { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.hh-metric-card__label { color:var(--hh-color-text-muted); font-size:.875rem; }
+.hh-metric-card__value { font-size:clamp(1.75rem,4vw,2.5rem); line-height:1; letter-spacing:-.03em; }
+.hh-metric-card__trend { font-size:.8125rem; font-weight:600; }
+.hh-metric-card--positive .hh-metric-card__trend { color:var(--hh-color-success); }
+.hh-metric-card--negative .hh-metric-card__trend { color:var(--hh-color-danger); }

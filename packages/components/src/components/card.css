@@ -1,0 +1,19 @@
+:host { display: block; }
+.card {
+  background: var(--hh-color-surface-raised);
+  border: 1px solid var(--hh-color-border);
+  border-radius: var(--hh-radius-lg);
+  color: var(--hh-color-text);
+  overflow: hidden;
+}
+.body { padding: var(--hh-space-5); }
+.card header:empty, .card footer:empty { display: none; }
+.card header, .card footer { padding: var(--hh-space-4) var(--hh-space-5); }
+.card header { border-bottom: 1px solid var(--hh-color-border); }
+.card footer { border-top: 1px solid var(--hh-color-border); }
+.interactive {
+  cursor: pointer;
+  transition: transform var(--hh-motion-fast) var(--hh-ease-standard), box-shadow var(--hh-motion-fast) var(--hh-ease-standard), border-color var(--hh-motion-fast) var(--hh-ease-standard);
+}
+.interactive:hover { transform: translateY(-2px); box-shadow: var(--hh-shadow-md); }
+.interactive:focus-visible { outline: none; border-color: var(--hh-color-action); box-shadow: var(--hh-focus-ring); }

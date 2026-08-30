@@ -1,0 +1,27 @@
+{
+  "name": "@handheld/components",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "stencil build --docs-readme false",
+    "typecheck": "stencil build --dev --docs-readme false",
+    "test": "stencil test --spec",
+    "lint": "node ../../tooling/lint/package-rules.mjs components"
+  },
+  "dependencies": {
+    "@handheld/foundation": "workspace:*",
+    "@handheld/icons": "workspace:*",
+    "@handheld/tokens": "workspace:*"
+  },
+  "devDependencies": {
+    "@stencil/core": "^4.38.0"
+  }
+}

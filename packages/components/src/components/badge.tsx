@@ -1,0 +1,6 @@
+import { Component, Prop, h } from '@stencil/core';
+@Component({ tag: 'hh-badge', styleUrl: 'badge.css', shadow: false })
+export class HhBadge {
+  @Prop() tone: 'neutral' | 'info' | 'success' | 'warning' | 'danger' = 'neutral';
+  render() { return <span class={`badge is-${this.tone}`}><slot /></span>; }
+}

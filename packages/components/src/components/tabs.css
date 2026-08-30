@@ -1,0 +1,4 @@
+:host { display: block; }
+.tab-list { display: flex; gap: var(--hh-space-1); overflow-x: auto; border-bottom: 1px solid var(--hh-color-border); }
+.tab { position: relative; min-height: 2.75rem; padding: 0 var(--hh-space-4); border: 0; background: transparent; color: var(--hh-color-text-muted); font: 650 var(--hh-font-size-sm)/1 var(--hh-font-family-sans); cursor: pointer; white-space: nowrap; }
+.tab::after { content: ''; position: absolute; inset-inline: var(--hh-space-3); bottom: -1px; height: 2px; background: transparent; }.tab:hover:not(:disabled) { color: var(--hh-color-text); }.tab.active { color: var(--hh-color-action); }.tab.active::after { background: var(--hh-color-action); }.tab:focus-visible { outline: none; box-shadow: var(--hh-focus-ring) inset; }.tab:disabled { opacity: .5; cursor: not-allowed; }

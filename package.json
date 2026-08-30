@@ -1,59 +1,39 @@
 {
-  "name": "simi-syllable",
-  "version": "1.0.0",
-  "type": "module",
-  "description": "Lightweight and accurate JavaScript/TypeScript library for counting and dividing syllables in English and Spanish",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
-  },
-  "files": [
-    "dist",
-    "data",
-    "README.md",
-    "LICENSE"
-  ],
+  "name": "handheld-design-system",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.0.0",
   "scripts": {
-    "build": "tsc",
-    "test": "vitest",
-    "test:coverage": "vitest --coverage",
-    "prepublishOnly": "npm run build && npm test"
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "typecheck": "turbo typecheck",
+    "test": "turbo test",
+    "lint": "node tooling/lint/design-rules.mjs && turbo lint",
+    "storybook": "pnpm --filter @handheld/storybook storybook",
+    "build:storybook": "pnpm --filter @handheld/storybook build-storybook",
+    "showcase": "pnpm --filter @handheld/showcase dev",
+    "build:showcase": "pnpm --filter @handheld/showcase build",
+    "test:showcase": "pnpm --filter @handheld/showcase test",
+    "test:visual": "pnpm --filter @handheld/testing test:visual",
+    "test:visual:update": "pnpm --filter @handheld/testing test:visual -- --update-snapshots",
+    "check": "pnpm check:icons && pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm build:storybook",
+    "release": "changeset publish",
+    "format:check": "prettier --check .",
+    "format": "prettier --write .",
+    "check:icons": "node tooling/validation/no-legacy-icons.mjs",
+    "test:contracts": "pnpm --filter @handheld/testing test:contracts",
+    "test:a11y": "pnpm --filter @handheld/testing test:a11y"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/benitoanagua/SimiSyllable.git"
-  },
-  "homepage": "https://github.com/benitoanagua/SimiSyllable#readme",
-  "bugs": {
-    "url": "https://github.com/benitoanagua/SimiSyllable/issues"
-  },
-  "keywords": [
-    "syllable",
-    "counter",
-    "divider",
-    "english",
-    "spanish",
-    "linguistics",
-    "phonetic",
-    "typescript",
-    "javascript",
-    "hiatus",
-    "diphthong",
-    "triphthong",
-    "multilingual"
-  ],
-  "author": "benitoanagua <benito.anagua@gmail.com>",
-  "license": "MIT",
   "devDependencies": {
-    "@types/node": "^22.10.2",
-    "typescript": "^5.9.2",
-    "vitest": "^3.2.4"
-  },
-  "engines": {
-    "node": ">=16.0.0"
+    "@changesets/cli": "^2.29.0",
+    "@playwright/test": "^1.55.0",
+    "@stencil/core": "^4.38.0",
+    "@storybook/addon-essentials": "^8.6.0",
+    "@storybook/web-components-vite": "^8.6.0",
+    "@types/node": "^22.0.0",
+    "prettier": "^3.5.0",
+    "storybook": "^8.6.0",
+    "turbo": "^2.5.0",
+    "typescript": "^5.7.0"
   }
 }
