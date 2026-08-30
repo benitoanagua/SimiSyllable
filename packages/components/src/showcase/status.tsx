@@ -1,6 +1,6 @@
 import { Component, Prop, h } from '@stencil/core';
 
-@Component({ tag: 'hh-status', styleUrl: 'status.css', shadow: false })
+@Component({ tag: 'hh-status', styleUrl: 'status.css', shadow: false, scoped: true })
 export class HhStatus {
   @Prop() tone: 'neutral' | 'success' | 'warning' | 'danger' | 'info' = 'neutral';
   @Prop() label = '';

@@ -1,6 +1,6 @@
 import { Component, Element, Event, type EventEmitter, Method, Prop, h } from '@stencil/core';
 
-@Component({ tag: 'hh-drawer', styleUrl: 'drawer.css', shadow: false })
+@Component({ tag: 'hh-drawer', styleUrl: 'drawer.css', shadow: false, scoped: true })
 export class HhDrawer {
   @Element() host!: HTMLElement;
   @Prop({ mutable: true }) open = false;

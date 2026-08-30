@@ -3,7 +3,7 @@ import type { HhButtonVariant, HhSize } from '../types';
 
 export type HhButtonSize = HhSize;
 
-@Component({ tag: 'hh-button', styleUrl: 'button.css', shadow: false })
+@Component({ tag: 'hh-button', styleUrl: 'button.css', shadow: false, scoped: true })
 export class HhButton {
   @Element() host!: HTMLElement;
   @Prop() variant: HhButtonVariant = 'primary';

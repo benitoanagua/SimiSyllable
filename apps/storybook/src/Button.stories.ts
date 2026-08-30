@@ -22,7 +22,7 @@ export const WithIcons = {
     h(
       'hh-button',
       null,
-      h('hh-icon', { slot: 'start', name: 'add' }),
+      h('hh-icon', { slot: 'start', name: 'plus' }),
       'Create',
     ),
 };

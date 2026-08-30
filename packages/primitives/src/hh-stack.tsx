@@ -1,6 +1,6 @@
 import { Component, Prop, h } from '@stencil/core';
 
-@Component({ tag: 'hh-stack', styleUrl: 'hh-stack.css', shadow: false })
+@Component({ tag: 'hh-stack', styleUrl: 'hh-stack.css', shadow: false, scoped: true })
 export class HhStack {
   @Prop() direction: 'row' | 'column' = 'column';
   @Prop() gap = 'var(--hh-space-4)';

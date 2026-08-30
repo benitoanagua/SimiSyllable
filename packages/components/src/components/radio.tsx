@@ -1,6 +1,6 @@
 import { Component, Event, type EventEmitter, Prop, h } from '@stencil/core';
 
-@Component({ tag: 'hh-radio', styleUrl: 'choice.css', shadow: false })
+@Component({ tag: 'hh-radio', styleUrl: 'choice.css', shadow: false, scoped: true })
 export class HhRadio {
   @Prop() label = '';
   @Prop({ mutable: true }) checked = false;

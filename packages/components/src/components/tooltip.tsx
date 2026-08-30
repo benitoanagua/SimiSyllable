@@ -1,6 +1,6 @@
 import { Component, Element, Prop, State, h } from '@stencil/core';
 
-@Component({ tag: 'hh-tooltip', styleUrl: 'tooltip.css', shadow: false })
+@Component({ tag: 'hh-tooltip', styleUrl: 'tooltip.css', shadow: false, scoped: true })
 export class HhTooltip {
   @Element() host!: HTMLElement;
   @Prop() text = '';

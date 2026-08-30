@@ -1,6 +1,6 @@
 import { Component, Event, type EventEmitter, Prop, State, h } from '@stencil/core';
 
-@Component({ tag: 'hh-alert', styleUrl: 'alert.css', shadow: false })
+@Component({ tag: 'hh-alert', styleUrl: 'alert.css', shadow: false, scoped: true })
 export class HhAlert {
   @State() visible = true;
   @Event() hhDismiss!: EventEmitter<void>;

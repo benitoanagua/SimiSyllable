@@ -1,6 +1,6 @@
 import { Component, Element, Event, type EventEmitter, Method, Prop, h } from '@stencil/core';
 
-@Component({ tag: 'hh-dialog', styleUrl: 'dialog.css', shadow: false })
+@Component({ tag: 'hh-dialog', styleUrl: 'dialog.css', shadow: false, scoped: true })
 export class HhDialog {
   @Element() host!: HTMLElement;
   @Prop({ mutable: true }) open = false;

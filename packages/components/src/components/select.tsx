@@ -1,6 +1,6 @@
 import { Component, Element, Event, type EventEmitter, Method, Prop, h } from '@stencil/core';
 
-@Component({ tag: 'hh-select', styleUrl: 'field.css', shadow: false })
+@Component({ tag: 'hh-select', styleUrl: 'field.css', shadow: false, scoped: true })
 export class HhSelect {
   @Element() host!: HTMLElement;
   @Prop() label = '';

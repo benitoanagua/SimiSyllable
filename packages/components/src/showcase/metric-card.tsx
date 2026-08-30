@@ -1,6 +1,6 @@
 import { Component, Prop, h } from '@stencil/core';
 
-@Component({ tag: 'hh-metric-card', styleUrl: 'metric-card.css', shadow: false })
+@Component({ tag: 'hh-metric-card', styleUrl: 'metric-card.css', shadow: false, scoped: true })
 export class HhMetricCard {
   @Prop() label = '';
   @Prop() value = '';

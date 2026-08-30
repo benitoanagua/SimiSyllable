@@ -8,7 +8,7 @@ export const Core = {
   render: () => stencilContent(`
       <div style="display:grid;gap:24px;padding:32px;max-width:900px;background:var(--hh-color-background);color:var(--hh-color-text)">
         <section style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-          <hh-button variant="primary"><hh-icon slot="start" name="add"></hh-icon>Primary</hh-button>
+          <hh-button variant="primary"><hh-icon slot="start" name="plus"></hh-icon>Primary</hh-button>
           <hh-button variant="secondary">Secondary</hh-button>
           <hh-button variant="tertiary">Tertiary</hh-button>
           <hh-button variant="danger">Danger</hh-button>

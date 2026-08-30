@@ -1,6 +1,6 @@
 import { Component, Element, Event, type EventEmitter, Prop, h } from '@stencil/core';
 
-@Component({ tag: 'hh-accordion-item', styleUrl: 'accordion.css', shadow: false })
+@Component({ tag: 'hh-accordion-item', styleUrl: 'accordion.css', shadow: false, scoped: true })
 export class HhAccordionItem {
   @Element() host!: HTMLElement;
   @Prop({ mutable: true }) open = false;

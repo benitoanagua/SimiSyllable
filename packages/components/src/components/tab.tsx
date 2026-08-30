@@ -1,6 +1,6 @@
 import { Component, Element, Event, type EventEmitter, Prop, h } from '@stencil/core';
 
-@Component({ tag: 'hh-tab', styleUrl: 'tabs.css', shadow: false })
+@Component({ tag: 'hh-tab', styleUrl: 'tabs.css', shadow: false, scoped: true })
 export class HhTab {
   @Element() host!: HTMLElement;
   @Prop() value!: string;

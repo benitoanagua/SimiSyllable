@@ -2,7 +2,7 @@ import { Component, Prop, h } from '@stencil/core';
 
 export interface HhTableColumn { key: string; label: string; numeric?: boolean; }
 
-@Component({ tag: 'hh-data-table', styleUrl: 'data-table.css', shadow: false })
+@Component({ tag: 'hh-data-table', styleUrl: 'data-table.css', shadow: false, scoped: true })
 export class HhDataTable {
   @Prop() columns: HhTableColumn[] = [];
   @Prop() rows: Record<string, string>[] = [];

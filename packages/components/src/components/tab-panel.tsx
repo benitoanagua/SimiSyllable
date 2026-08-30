@@ -1,6 +1,6 @@
 import { Component, Element, Prop, h } from '@stencil/core';
 
-@Component({ tag: 'hh-tab-panel', styleUrl: 'tabs.css', shadow: false })
+@Component({ tag: 'hh-tab-panel', styleUrl: 'tabs.css', shadow: false, scoped: true })
 export class HhTabPanel {
   @Element() host!: HTMLElement;
   @Prop() value!: string;

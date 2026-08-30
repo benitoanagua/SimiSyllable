@@ -1,6 +1,6 @@
 import { Component, Prop, h } from '@stencil/core';
 
-@Component({ tag: 'hh-form-field', styleUrl: 'field.css', shadow: false })
+@Component({ tag: 'hh-form-field', styleUrl: 'field.css', shadow: false, scoped: true })
 export class HhFormField {
   @Prop() label = '';
   @Prop() hint = '';

@@ -1,6 +1,6 @@
 import { Component, Prop, h } from '@stencil/core';
 
-@Component({ tag: 'hh-spinner', styleUrl: 'spinner.css', shadow: false })
+@Component({ tag: 'hh-spinner', styleUrl: 'spinner.css', shadow: false, scoped: true })
 export class HhSpinner {
   @Prop() label = 'Loading';
   render() {

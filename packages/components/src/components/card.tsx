@@ -1,6 +1,6 @@
 import { Component, Event, type EventEmitter, Prop, h } from '@stencil/core';
 
-@Component({ tag: 'hh-card', styleUrl: 'card.css', shadow: false })
+@Component({ tag: 'hh-card', styleUrl: 'card.css', shadow: false, scoped: true })
 export class HhCard {
   @Prop() interactive = false;
   @Event() hhPress!: EventEmitter<MouseEvent | KeyboardEvent>;

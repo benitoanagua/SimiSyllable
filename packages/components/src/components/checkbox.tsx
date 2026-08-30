@@ -1,6 +1,6 @@
 import { Component, Event, type EventEmitter, Prop, h } from '@stencil/core';
 
-@Component({ tag: 'hh-checkbox', styleUrl: 'choice.css', shadow: false })
+@Component({ tag: 'hh-checkbox', styleUrl: 'choice.css', shadow: false, scoped: true })
 export class HhCheckbox {
   @Prop() label = '';
   @Prop({ mutable: true }) checked = false;

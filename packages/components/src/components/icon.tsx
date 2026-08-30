@@ -1,7 +1,7 @@
 import { Component, Prop, h } from '@stencil/core';
 import { resolveTablerIcon } from '@handheld/icons';
 
-@Component({ tag: 'hh-icon', styleUrl: 'icon.css', shadow: false })
+@Component({ tag: 'hh-icon', styleUrl: 'icon.css', shadow: false, scoped: true })
 export class HhIcon {
   @Prop() name!: string;
   @Prop({ attribute: 'aria-label' }) ariaLabel?: string;

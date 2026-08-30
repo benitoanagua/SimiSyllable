@@ -1,6 +1,6 @@
 import { Component, Event, type EventEmitter, Prop, h } from '@stencil/core';
 
-@Component({ tag: 'hh-nav-item', styleUrl: 'nav.css', shadow: false })
+@Component({ tag: 'hh-nav-item', styleUrl: 'nav.css', shadow: false, scoped: true })
 export class HhNavItem {
   @Prop() href = '';
   @Prop() active = false;
