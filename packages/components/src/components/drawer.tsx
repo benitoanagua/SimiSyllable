@@ -49,10 +49,9 @@ export class HhDrawer {
   };
 
   render() {
-    if (!this.open) return null;
     const titleId = `${this.host.id || 'hh-drawer'}-title`;
     return (
-      <div class="drawer-root" onKeyDown={this.onKeyDown}>
+      <div class="drawer-root" hidden={!this.open} onKeyDown={this.onKeyDown}>
         <button class="scrim" type="button" aria-label="Close navigation" onClick={() => { this.open = false; }}></button>
         <aside class={`drawer is-${this.side}`} role="dialog" aria-modal="true" aria-labelledby={this.label ? titleId : undefined}>
           <header>
