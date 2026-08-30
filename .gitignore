@@ -104,3 +104,7 @@ temp/
 # turbo
 .turbo
 *.turbo-*.log
+
+# Custom
+apps/storybook/.stencil/
+apps/storybook/storybook-static/
