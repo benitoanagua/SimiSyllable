@@ -1,4 +1,4 @@
-import { Component, Element, Event, EventEmitter, Method, Prop, h } from '@stencil/core';
+import { Component, Element, Event, type EventEmitter, Method, Prop, h } from '@stencil/core';
 
 @Component({ tag: 'hh-dialog', styleUrl: 'dialog.css', shadow: false })
 export class HhDialog {

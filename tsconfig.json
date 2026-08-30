@@ -8,5 +8,7 @@
     "noEmit": true,
     "verbatimModuleSyntax": true,
     "isolatedModules": true
-  }
+  },
+  "include": [],
+  "exclude": ["node_modules", "dist"]
 }

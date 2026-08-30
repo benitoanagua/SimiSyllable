@@ -1,4 +1,4 @@
-import { Component, Event, EventEmitter, Prop, h } from '@stencil/core';
+import { Component, Event, type EventEmitter, Prop, h } from '@stencil/core';
 
 @Component({ tag: 'hh-switch', styleUrl: 'choice.css', shadow: false })
 export class HhSwitch {

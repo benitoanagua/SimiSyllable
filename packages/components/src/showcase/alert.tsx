@@ -1,4 +1,4 @@
-import { Component, Event, EventEmitter, Prop, State, h } from '@stencil/core';
+import { Component, Event, type EventEmitter, Prop, State, h } from '@stencil/core';
 
 @Component({ tag: 'hh-alert', styleUrl: 'alert.css', shadow: false })
 export class HhAlert {

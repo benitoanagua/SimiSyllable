@@ -1,4 +1,4 @@
-import { Component, Element, Event, EventEmitter, Method, Prop, h } from '@stencil/core';
+import { Component, Element, Event, type EventEmitter, Method, Prop, h } from '@stencil/core';
 import type { HhButtonVariant, HhSize } from '../types';
 
 export type HhButtonSize = HhSize;

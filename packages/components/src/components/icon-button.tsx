@@ -1,4 +1,4 @@
-import { Component, Element, Event, EventEmitter, Method, Prop, h } from '@stencil/core';
+import { Component, Element, Event, type EventEmitter, Method, Prop, h } from '@stencil/core';
 
 @Component({ tag: 'hh-icon-button', styleUrl: 'icon-button.css', shadow: false })
 export class HhIconButton {
